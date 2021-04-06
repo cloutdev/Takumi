@@ -1,5 +1,6 @@
 const db = require("../../tools/database.js");
 const {QueryTypes} = require('sequelize');
+const moment = require('moment');
 //Here the command starts
 module.exports = {
     //definition
@@ -24,9 +25,22 @@ module.exports = {
 		channelsToClose.forEach((databaseChannel) => {
 			client.channels.fetch(databaseChannel.channelID).then((channel)=>{
 				console.log(channel);
-				console.log("Channel with name "+channel.name+" and ID "+channel.id+" is deletable: " +channel.deletable + " if it is, it will be deleted at "+databaseChannel.expiresOn);
+				message.channel.send(`Channel with name ${channel.name} is ${channel.deletable ? "" : "not"}deletable. if it is, it will be deleted at ${moment(databaseChannel.expiresOn).format("DD.MM.YYYY HH:mm")}`);
 			})
 		});
 
+/*SELECT * from channels where expiresOn <= now() AND isClosed = 0*/
+		const expiredChannels = await db.query("SELECT * from channels where expiresOn <= now()",{
+			type: QueryTypes.SELECT,
+			logging: console.log,
+		});
+
+		console.log(expiredChannels);
+		expiredChannels.forEach((databaseChannel) => {
+			client.channels.fetch(databaseChannel.channelID).then((channel)=>{
+				console.log(channel);
+				message.channel.send(`GayChannel with name ${channel.name} is ${channel.deletable ? "" : "not"}deletable. if it is, it will be deleted at ${moment(databaseChannel.expiresOn).format("DD.MM.YYYY HH:mm")}`);
+			}).catch(()=>{message.channel.send(`Couldn't locate channel with ID ${databaseChannel.channelID}`)});
+		});
     }
 }

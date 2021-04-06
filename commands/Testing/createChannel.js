@@ -16,13 +16,36 @@ module.exports = {
     run: async (client, message, args, user, text, prefix) => {
 
 		moment.defaultFormat = "YYYY-MM-DD HH:mm:ss"
-		const channelName = "Test1🧡";
-		const channelDesc = "Tesesttttastt 🧡💟💟☮🕳🧡❤";
+		const channelName = "Test1";
+		const channelDesc = moment().format();
 
+		const testArr = [828233004383338498];
+		let permsArray = [
+			{
+				id: user.id,
+				allow: [
+					'MANAGE_CHANNELS'
+				]
+			}
+		];
+		await testArr.forEach((modID)=>{
+			permsArray.push({
+				id: modID.toString(),
+				allow: [
+					'MANAGE_MESSAGES',
+					'EMBED_LINKS'
+				]
+			});
+		});
+		console.log(permsArray);
+		
 		const createdChannelID = (await message.guild.channels.create(channelName,{
-			topic : channelDesc
-		})).id;
-
+			topic : channelDesc,
+			permissionOverwrites: permsArray
+		})
+		).id;
+		// TODO: Why does this not recognise the user IDs provided in testArr? It works ONLY when I provide the author's ID. :thonk:
+		
 		console.log(
 			await db.query('INSERT INTO channels (channelName, description, guildID, channelID, createdBy, masterUser, startsOn, expiresOn) values (?, ?, ?, ?, ?, ?, ?, ?)',{
 				replacements: [channelName, channelDesc, message.guild.id, createdChannelID, user.id, user.id, moment().format(), moment().add(1, "minutes").format()],
