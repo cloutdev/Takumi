@@ -32,23 +32,11 @@ module.exports = {
 				]
 			}
 		];
-		await testArr.forEach((modID)=>{
-			permsArray.push({
-				id: modID,
-				type: 'member',
-				allow: [
-					'MANAGE_MESSAGES',
-					'EMBED_LINKS'
-				]
-			});
-		});
 		console.log(permsArray);
 		console.log(guild.openCategoryID);
 		const createdChannelID = await message.guild.channels.create(channelName,{
 			topic : channelDesc,
 			parent: guild.openCategoryID,
-			
-			//permissionOverwrites: permsArray
 		}).then((channel)=>{
 			channel.updateOverwrite(user.id, 
 				{
@@ -64,7 +52,6 @@ module.exports = {
 					'EMBED_LINKS' : true,
 				})
 			});
-			//channel.setParent(guild.openCategoryID);
 			return channel.id;
 		}).catch(()=>{
 			message.reply("Something went wrong. Please try again later.");
