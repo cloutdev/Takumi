@@ -1,13 +1,16 @@
 //Modules
-const { Client, Collection } = require("discord.js");
+const db = require("./tools/database");
 const {QueryTypes} = require('sequelize');
-const db = require('./tools/database');
+//const toolkit = require("./tools/toolkit");
+
+const { Client, Collection } = require("discord.js");
+const checkChannels = require('./daemon/checkChannels');
 const config = require("./config.json"); //loading config file with token and prefix
 const prefix = (config.prefix); //defining the prefix as a constant variable
 const fs = require("fs"); //this package is for reading files and getting their inputs
 
 const client = new Client({
-		disableEveryone: true,  //disables, that the bot is able to send @everyone
+		disableEveryone: false,  //disables, that the bot is able to send @everyone
 		partials: ['MESSAGE', 'CHANNEL', 'REACTION'] //creating the client with partials, so you can fetch OLD messages
 }); 
 
@@ -90,25 +93,25 @@ client.on("message", async message => {
 		
 });
 
-/*client.on('ready', () => {
-	setInterval(async function check(){
-		const channelsToClose = await db.query("SELECT * from channels where expiresOn >= now() AND isClosed = 0",{
-			type: QueryTypes.SELECT,
-			logging: console.log,
+client.on('ready', async function(){
+
+	/*
+
+	await client.channels.fetch('829822754819538965').then((channel)=>{
+		toolkit.closeChannel(channel,client);
+	}).catch(console.log("here is error"));
+
+	*/
+
+	const allGuilds = await db.query("SELECT * from settings",{
+        type: QueryTypes.SELECT,
+      });
+	setInterval(() => {
+		allGuilds.forEach((guild) => {
+			checkChannels.periodicCheckForChannels(client, guild);
 		});
-		console.log(channelsToClose);
-
-
-		channelsToClose.forEach((channel) => {
-			client.channels.fetch(channel.channelID).then((channel)=>{
-				console.log(channel);
-			})
-		});
-
-		
-	}, 3000); 
+	}, 3000);
 });
-*/
 
 
 
