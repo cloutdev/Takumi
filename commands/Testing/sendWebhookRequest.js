@@ -11,6 +11,7 @@ module.exports = {
     description: "Resends the message", //the description of the command
 
     //running the command with the parameters: client, message, args, user, text, prefix
+    // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
 		const res = await webhookSender.createProductID(message.channel.id, "adonisdounis1@mail.com");
 		message.reply(res);
