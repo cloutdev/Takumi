@@ -1,6 +1,5 @@
 const db = require("../../tools/database.js");
 const {QueryTypes} = require('sequelize');
-const moment = require('moment');
 //Here the command starts
 module.exports = {
     //definition
@@ -14,15 +13,20 @@ module.exports = {
     //running the command with the parameters: client, message, args, user, text, prefix
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
+		const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
+			replacements: [message.guild.id],
+			type: QueryTypes.SELECT,
+		}))[0];
 
-		moment.defaultFormat = "YYYY-MM-DD HH:mm:ss"
 		const channelName = "Test1";
-		const channelDesc = moment().format();
+		const channelDesc = "GAyyyyyyyyyy";
+		
+		const testArr = ['581575466578870302', '675476898926559239'];
 
-		const testArr = [828233004383338498];
 		let permsArray = [
 			{
 				id: user.id,
+				type: 'member',
 				allow: [
 					'MANAGE_CHANNELS'
 				]
@@ -30,7 +34,8 @@ module.exports = {
 		];
 		await testArr.forEach((modID)=>{
 			permsArray.push({
-				id: modID.toString(),
+				id: modID,
+				type: 'member',
 				allow: [
 					'MANAGE_MESSAGES',
 					'EMBED_LINKS'
@@ -41,14 +46,14 @@ module.exports = {
 		
 		const createdChannelID = (await message.guild.channels.create(channelName,{
 			topic : channelDesc,
+			parent: guild.openCategoryID,
 			permissionOverwrites: permsArray
 		})
 		).id;
-		// TODO: Why does this not recognise the user IDs provided in testArr? It works ONLY when I provide the author's ID. :thonk:
-		
+
 		console.log(
-			await db.query('INSERT INTO channels (channelName, description, guildID, channelID, createdBy, masterUser, startsOn, expiresOn) values (?, ?, ?, ?, ?, ?, ?, ?)',{
-				replacements: [channelName, channelDesc, message.guild.id, createdChannelID, user.id, user.id, moment().format(), moment().add(1, "minutes").format()],
+			await db.query('INSERT INTO channels (guildID, channelID, createdBy, masterUser, startsOn, expiresOn) values (?, ?, ?, ?, now(), DATE_ADD(now(), INTERVAL ? MINUTE))',{
+				replacements: [message.guild.id, createdChannelID, user.id, user.id, 1],
 				type: QueryTypes.INSERT,
 				logging: console.log,
 			})
