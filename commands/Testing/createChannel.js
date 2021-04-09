@@ -10,7 +10,7 @@ module.exports = {
     usage: "say <Text>", //this is for the help command for EACH cmd
     description: "Resends the message", //the description of the command
 
-    //running the command with the parameters: client, message, args, user, text, prefix
+    //running the command with the parameters: client, message, args, user, text, prefix '581575466578870302', '675476898926559239'
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
 		const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
@@ -21,14 +21,14 @@ module.exports = {
 		const channelName = "Test1";
 		const channelDesc = "GAyyyyyyyyyy";
 		
-		const testArr = ['581575466578870302', '675476898926559239'];
+		const testArr = [];
 
 		let permsArray = [
 			{
 				id: user.id,
 				type: 'member',
 				allow: [
-					'MANAGE_CHANNELS'
+					['MANAGE_CHANNELS', 'SEND_MESSAGES']
 				]
 			}
 		];
@@ -43,13 +43,33 @@ module.exports = {
 			});
 		});
 		console.log(permsArray);
-		
-		const createdChannelID = (await message.guild.channels.create(channelName,{
+		console.log(guild.openCategoryID);
+		const createdChannelID = await message.guild.channels.create(channelName,{
 			topic : channelDesc,
 			parent: guild.openCategoryID,
-			permissionOverwrites: permsArray
-		})
-		).id;
+			
+			//permissionOverwrites: permsArray
+		}).then((channel)=>{
+			channel.updateOverwrite(user.id, 
+				{
+					'MANAGE_CHANNELS': true,
+					'SEND_MESSAGES': true,
+					'EMBED_LINKS': true,
+					'ATTACH_FILES': true,
+				}
+			);
+			testArr.forEach((modID) => {
+				channel.updateOverwrite(modID, {
+					'MANAGE_MESSAGES': true,
+					'EMBED_LINKS' : true,
+				})
+			});
+			//channel.setParent(guild.openCategoryID);
+			return channel.id;
+		}).catch(()=>{
+			message.reply("Something went wrong. Please try again later.");
+			return;
+		});
 
 		console.log(
 			await db.query('INSERT INTO channels (guildID, channelID, createdBy, masterUser, startsOn, expiresOn) values (?, ?, ?, ?, now(), DATE_ADD(now(), INTERVAL ? MINUTE))',{
@@ -62,7 +82,5 @@ module.exports = {
 		console.log(
 			await db.query("SELECT * from channels where expiresOn >= now()")
 		);
-
-
     }
 }
