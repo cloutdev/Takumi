@@ -103,6 +103,8 @@ client.on('ready', async function(){
 
 	*/
 
+	const webhookListener = require("./daemon/webhooks/webhookListener");
+
 	const allGuilds = await db.query("SELECT * from settings",{
         type: QueryTypes.SELECT,
 	});
