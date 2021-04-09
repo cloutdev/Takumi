@@ -33,14 +33,12 @@ module.exports = {
         permissionOverwrites: [
           {
             id: message.guild.id,
-            deny: ["VIEW_CHANNEL"]
+            deny: ["VIEW_CHANNEL", "SEND_MESSAGES"],
           }
         ]
       })
       ).id;
 
-
-      
       return;
       // TODO: Fix this fucking shit what is this
 

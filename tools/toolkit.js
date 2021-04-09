@@ -3,6 +3,8 @@ const {QueryTypes} = require('sequelize');
 
 async function closeChannel(channelToBeClosed, discordClient){
 
+	const modArray = [];
+
 	const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
 		replacements: [channelToBeClosed.guild.id],
 		type: QueryTypes.SELECT,
@@ -20,7 +22,19 @@ async function closeChannel(channelToBeClosed, discordClient){
 		type: QueryTypes.UPDATE,
 		logging: false,
 	}).then(()=>{
-		channelToBeClosed.setParent(guild.closedCategoryID);
+		channelToBeClosed.setParent(guild.closedCategoryID).then((channelToBeClosed)=>{
+			channelToBeClosed.updateOverwrite(dbChannel.masterUser, 
+				{
+					"VIEW_CHANNEL": true
+				}
+			);
+			modArray.forEach((modID) => {
+				channelToBeClosed.updateOverwrite(modID, {
+					"VIEW_CHANNEL": true
+				})
+			});
+		});
+
 		discordClient.channels.fetch(guild.privateBotChannel).then((channel)=>{
 			channel.send(channelToBeClosed.name+" Moved to Closed Channels!");
 		});
