@@ -1,6 +1,5 @@
 const db = require("../../tools/database.js");
 const {QueryTypes} = require('sequelize');
-const moment = require('moment');
 //Here the command starts
 module.exports = {
     //definition
@@ -15,32 +14,31 @@ module.exports = {
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
 
-		const channelsToClose = await db.query("SELECT * from channels where expiresOn >= now() AND isClosed = 0",{
-			type: QueryTypes.SELECT,
-			logging: console.log,
-		});
-		console.log(channelsToClose);
-
-
-		channelsToClose.forEach((databaseChannel) => {
-			client.channels.fetch(databaseChannel.channelID).then((channel)=>{
-				console.log(channel);
-				message.channel.send(`Channel with name ${channel.name} is ${channel.deletable ? "" : "not"}deletable. if it is, it will be deleted at ${moment(databaseChannel.expiresOn).format("DD.MM.YYYY HH:mm")}`);
-			})
-		});
-
-/*SELECT * from channels where expiresOn <= now() AND isClosed = 0*/
-		const expiredChannels = await db.query("SELECT * from channels where expiresOn <= now()",{
+		const nonExpiredChannels = await db.query("SELECT * from channels where expiresOn > now() AND isClosed = 0",{
 			type: QueryTypes.SELECT,
 			logging: console.log,
 		});
 
+		console.log("Channels that DONT need to be closed:");
+		console.log(nonExpiredChannels);
+		
+		const expiredChannels = await db.query("SELECT * from channels where expiresOn <= now() and isClosed  = 0",{
+			type: QueryTypes.SELECT,
+			logging: console.log,
+		});
+
+		console.log("Channels that need to be closed:");
+		console.log(expiredChannels);
+
+/*
 		console.log(expiredChannels);
 		expiredChannels.forEach((databaseChannel) => {
 			client.channels.fetch(databaseChannel.channelID).then((channel)=>{
 				console.log(channel);
-				message.channel.send(`GayChannel with name ${channel.name} is ${channel.deletable ? "" : "not"}deletable. if it is, it will be deleted at ${moment(databaseChannel.expiresOn).format("DD.MM.YYYY HH:mm")}`);
+				channel.send(`Channel with name ${channel.name} is ${channel.deletable ? "" : "not"}deletable. if it is, it'll be deleted ASAP.`);
 			}).catch(()=>{message.channel.send(`Couldn't locate channel with ID ${databaseChannel.channelID}`)});
 		});
+
+		*/
     }
 }
