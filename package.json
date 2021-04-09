@@ -5,11 +5,16 @@
   "main": "index.js",
   "dependencies": {
     "ascii-table": "^0.0.9",
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
     "common-tags": "^1.8.0",
+    "crypto-js": "^4.0.0",
     "discord.js": "^12.5.1",
+    "express": "^4.17.1",
     "got": "^11.8.1",
     "mariadb": "^2.5.3",
     "moment": "^2.29.1",
+    "raw-body": "^2.4.1",
     "sequelize": "^6.6.2"
   },
   "devDependencies": {},
