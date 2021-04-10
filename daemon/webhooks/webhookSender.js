@@ -2,9 +2,9 @@ const axios = require("axios").default;
 const db = require("../../tools/database");
 const {QueryTypes} = require('sequelize');
 
-async function createProductID(channelID, email){
+async function createExtensionProductID(channelID, email, discordGuild, days){
 	console.log("here");
-
+	console.log(channelID);
 	const guildID = (await db.query("SELECT guildID from channels WHERE channelID = ?",{
 		replacements: [channelID],
 		type: QueryTypes.SELECT,
@@ -17,20 +17,23 @@ async function createProductID(channelID, email){
 		logging: false,
 	}))[0]; 
 
+
+
 	const payload = {
-		"title": "Demo Payment",
-		"gateway": "BITCOIN",
-		"value": 0.5,
-		"currency": "EUR",
-		"quantity": 3,
+		"title": `${days}-day shop subscription in ${discordGuild.name}`,
+		"gateway": "bitcoin",
+		"value": guild.pricePerDay,
+		"currency": "USD",
+		"quantity": days,
 		"confirmations": 1,
 		"email": email,
 		"custom_fields":  {
-			"ChannelID": channelID
+			"action": "update",
+			"ChannelID": "C"+channelID.toString()
 		},
-		"webhook": "http://a82bf2491bc8.ngrok.io",
+		"webhook": "https://7a7b34b89e8b.ngrok.io",
 		"white_label": false,
-		"return_url": "http://a82bf2491bc8.ngrok.io"
+		"return_url": "https://7a7b34b89e8b.ngrok.io"
 	}
 
 	console.log(payload);
@@ -46,11 +49,12 @@ async function createProductID(channelID, email){
 	})
 		.then((res)=>{
 			if(res.data.status != 200){
-				throw `APIError ${res.data.status}`;
+				console.log(res);
+				throw `APIError ${res.data.status}`;	
 			}
 			console.log("success!");
 			console.log(res.data.data.url);
-			return res.data.data.url;
+			return res.data;
 		})
 		.catch((obj)=>{
 			console.log("error");
@@ -60,4 +64,32 @@ async function createProductID(channelID, email){
 	return await sellixRequest;
 }
 
-module.exports.createProductID = createProductID;
+async function createCreationProductID(email, discordGuild, days){
+
+	const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
+		replacements: [discordGuild.id],
+		type: QueryTypes.SELECT,
+		logging: false,
+	}))[0]; 
+
+
+
+	const payload = {
+		"title": `${days}-day shop subscription in ${discordGuild.name}`,
+		"gateway": "bitcoin",
+		"value": guild.pricePerDay,
+		"currency": "USD",
+		"quantity": days,
+		"confirmations": 1,
+		"email": email,
+		"custom_fields":  {
+			"action": "update",
+			"ChannelID": "C"+channelID.toString()
+		},
+		"webhook": "https://7a7b34b89e8b.ngrok.io",
+		"white_label": false,
+		"return_url": "https://7a7b34b89e8b.ngrok.io"
+	}
+}
+
+module.exports.createExtensionProductID = createExtensionProductID;

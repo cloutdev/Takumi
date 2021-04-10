@@ -1,22 +1,64 @@
 const crypto = require('crypto');
+const db = require("../../tools/database");
+const {QueryTypes} = require('sequelize');
 
-async function verifySellixWebhook(request, headers){
+async function processSellixWebhook(request, headers, discordClient){
 
-	const secret = "3pHyz1Ux8S9Iiy5BBMJNsBJtmnLHezgk";
-	const received_signature = headers["x-sellix-signature"];
-    var digest = crypto
-		.createHmac('sha512', secret)
-		.update(request, 'utf8', 'hex')
-		.digest('hex');
-	
-	if(received_signature === digest){
-		console.log("signatures match!")
-		const body = JSON.parse(request.toString());
-		if(body.event == "order:paid"){
-			console.log(body)
+	const allGuilds = await db.query("SELECT * from settings",{
+        type: QueryTypes.SELECT,
+	});
+
+	let guild;
+	let body;
+	//If you do not know what Iterable.every() is, Google it
+	await allGuilds.every((selectedGuild) => {
+		const secret = selectedGuild.sellixSecret;
+		const received_signature = headers["x-sellix-signature"];
+		var digest = crypto
+			.createHmac('sha512', secret)
+			.update(request, 'utf8', 'hex')
+			.digest('hex');
+		
+		if(received_signature === digest) {
+			guild = selectedGuild;
+			body = JSON.parse(request.toString());
+			return false;
+		}else return true;
+	});
+
+	if(guild === undefined) {return -2} //If the every() function reaches the end of the allGuilds array and has not reached a true statement, return -1.
+
+	//If the program has reached this point, you can be sure that the signatures are equal.
+	switch(body.data.custom_fields.action){
+		case "update":
+			{
+				const channelID = (body.data.custom_fields.ChannelID).substring(1);
+				db.query('UPDATE channels SET expiresOn = DATE_ADD(expiresOn, INTERVAL ? DAY) WHERE channelID = ?',{
+					replacements: [body.data.quantity, (channelID)],
+					type: QueryTypes.UPDATE,
+					logging: console.log,
+				}).then(()=>{
+					discordClient.channels.fetch((channelID).toString()).then((channel)=>{
+						channel.send(`This channel has been renewed for ${body.data.quantity} days!`)
+					});
+				}
+				)
+				
+				
+
+				break;
+			}
+		case "create":
+			{
+				console.log("I have to create a channel!");
+				break;
+			}
+		
+		default: {
+			console.log("yikes");
 		}
+	}
 
-	}else console.log("sigs not equal");
 }
 
-module.exports.verifySellixWebhook = verifySellixWebhook;
+module.exports.processSellixWebhook = processSellixWebhook;
