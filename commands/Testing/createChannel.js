@@ -42,6 +42,7 @@ module.exports = {
 				{
 					'MANAGE_CHANNELS': true,
 					'SEND_MESSAGES': true,
+					'MANAGE_MESSAGES': true,
 					'EMBED_LINKS': true,
 					'ATTACH_FILES': true,
 				}
