@@ -6,14 +6,17 @@ const getRawBody = require('raw-body')
 const app = express()
 const PORT = 3000
 
-// Tell express to use body-parser's JSON parsing
-//app.use(bodyParser.json())
 // Start express on the defined port
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))
+function startServer(client){
+  app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))
 
-app.post("/", async (req, res) => {
+  app.post("/", async (req, res) => {
 
-  const rawReq = await getRawBody(req)
-  manager.verifySellixWebhook(rawReq, req.headers);
-  res.status(200).end() // Responding is important
-})
+    const rawReq = await getRawBody(req)
+    manager.processSellixWebhook(rawReq, req.headers, client);
+    res.status(200).end() // Responding is important
+  })
+}
+
+
+module.exports.startServer = startServer;
