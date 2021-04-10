@@ -1,6 +1,7 @@
 //Modules
 const db = require("./tools/database");
 const {QueryTypes} = require('sequelize');
+const webhookListener = require("./daemon/webhooks/webhookListener");
 //const toolkit = require("./tools/toolkit");
 
 const { Client, Collection } = require("discord.js");
@@ -103,7 +104,7 @@ client.on('ready', async function(){
 
 	*/
 
-	const webhookListener = require("./daemon/webhooks/webhookListener");
+	webhookListener.startServer(client);
 
 	const allGuilds = await db.query("SELECT * from settings",{
         type: QueryTypes.SELECT,
