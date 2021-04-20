@@ -16,7 +16,7 @@ async function periodicCheckForChannels(client, guildSettings){
 		client.channels.fetch(databaseChannel.channelID).then((channel)=>{
 			generalChannel.send(`Channel with name ${channel.name} is ${channel.deletable ? "" : "not"}deletable. if it is, it'll be deleted ASAP.`);
 			if(channel.deletable){
-				toolkit.closeChannel(channel, client);
+				toolkit.closeChannel(channel, "The channel time expired. If you want to renew the channel, please contact the server moderation team.", client);
 			}
 		}).catch(()=>{generalChannel.send(`Couldn't locate channel with ID ${databaseChannel.channelID}`)});
 	});
