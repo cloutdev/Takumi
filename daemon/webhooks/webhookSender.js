@@ -31,9 +31,9 @@ async function createExtensionProductID(channelID, email, discordGuild, days){
 			"action": "update",
 			"ChannelID": "C"+channelID.toString()
 		},
-		"webhook": "https://7a7b34b89e8b.ngrok.io",
+		"webhook": "http://95844b3ee5b5.ngrok.io",
 		"white_label": false,
-		"return_url": "https://7a7b34b89e8b.ngrok.io"
+		"return_url": "http://95844b3ee5b5.ngrok.io"
 	}
 
 	console.log(payload);
@@ -64,7 +64,7 @@ async function createExtensionProductID(channelID, email, discordGuild, days){
 	return await sellixRequest;
 }
 
-async function createCreationProductID(email, discordGuild, days){
+async function createCreationProductID(email, discordGuild, masterUser, days){
 
 	const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
 		replacements: [discordGuild.id],
@@ -72,24 +72,49 @@ async function createCreationProductID(email, discordGuild, days){
 		logging: false,
 	}))[0]; 
 
-
-
 	const payload = {
-		"title": `${days}-day shop subscription in ${discordGuild.name}`,
+		"title": `Shop creation in ${discordGuild.name}`,
 		"gateway": "bitcoin",
-		"value": guild.pricePerDay,
+		"value": guild.pricePerDay * 10,
 		"currency": "USD",
 		"quantity": days,
 		"confirmations": 1,
 		"email": email,
 		"custom_fields":  {
-			"action": "update",
-			"ChannelID": "C"+channelID.toString()
+			"action": "create",
+			"guildID": "G"+(discordGuild.id).toString(),
+			"masterUser" : "U"+(masterUser.id).toString()
 		},
-		"webhook": "https://7a7b34b89e8b.ngrok.io",
+		"webhook": "https://95844b3ee5b5.ngrok.io",
 		"white_label": false,
-		"return_url": "https://7a7b34b89e8b.ngrok.io"
+		"return_url": "https://95844b3ee5b5.ngrok.io"
 	}
+
+	const sellixRequest = await axios({
+		method: "POST",
+		url: "https://dev.sellix.io/v1/payments",
+		data:payload,
+		headers: {
+			"User-Agent": "MarketplaceBotWebhooks",
+			"Authorization" : `Bearer ${guild.sellixAPIKey}`,
+		}
+})
+	.then((res)=>{
+		if(res.data.status != 200){
+			console.log(res);
+			throw `APIError ${res.data.status}`;	
+		}
+		console.log("success!");
+		console.log(res.data.data.url);
+		return res.data;
+	})
+	.catch((obj)=>{
+		console.log("error");
+		console.log(obj)
+	});
+
+return await sellixRequest;
 }
 
 module.exports.createExtensionProductID = createExtensionProductID;
+module.exports.createCreationProductID = createCreationProductID;
