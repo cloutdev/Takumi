@@ -1,7 +1,7 @@
 const db = require("../tools/database");
 const {QueryTypes} = require('sequelize');
-
-async function closeChannel(channelToBeClosed, discordClient){
+const moment = require('moment');
+async function closeChannel(channelToBeClosed, reason, discordClient){
 
 	const modArray = (await db.query("SELECT * from mods WHERE channelID = ?",{
 		replacements: [channelToBeClosed.id],
@@ -43,9 +43,55 @@ async function closeChannel(channelToBeClosed, discordClient){
 			channel.send(channelToBeClosed.name+" Moved to Closed Channels!");
 		});
 		discordClient.users.fetch(dbChannel.masterUser).then((user)=>{
-			user.send(`Hello! You had purchased a channel at the server \`${channelToBeClosed.guild.name}\`, but since you did not renew your subscription for that channel, we are afraid that the channel with name \`${channelToBeClosed.name}\` was closed. You can reopen the channel, as we did not delete it.`);
+			user.send(`Hello! We had to close the channel you had purchased at the server \`${channelToBeClosed.guild.name}\` for the following reason: \nReason: \`${reason}\``);
 		});
 	});
 }
 
+async function createChannel(discordClient, guildID, masterUserID, createdBy){
+
+	const discordGuild = await discordClient.guilds.fetch(guildID);
+
+	const masterUser = await discordClient.users.fetch(masterUserID);
+
+	const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
+		replacements: [guildID],
+		type: QueryTypes.SELECT,
+	}))[0];
+
+	const channelName = `${masterUser.username}'s Store`;
+	const channelDesc = `This shop was opened on ${moment()}`;
+	
+	const createdChannelID = await discordGuild.channels.create(channelName,{
+		topic : channelDesc,
+		parent: guild.openCategoryID,
+	}).then((channel)=>{
+		channel.updateOverwrite(masterUserID, 
+			{
+				'MANAGE_CHANNELS': true,
+				'SEND_MESSAGES': true,
+				'MANAGE_MESSAGES': true,
+				'EMBED_LINKS': true,
+				'ATTACH_FILES': true,
+			}
+		);
+
+		return channel.id;
+	}).catch(()=>{
+		masterUser.send("Something went wrong with your channel creation request. Please try again later or contact the server moderation team.");
+		return;
+	});
+
+
+	await db.query('INSERT INTO channels (guildID, channelID, createdBy, masterUser, startsOn, expiresOn) values (?, ?, ?, ?, now(), DATE_ADD(now(), INTERVAL ? MINUTE))',{
+		replacements: [guildID, createdChannelID, createdBy, masterUserID, 1],
+		type: QueryTypes.INSERT,
+		logging: console.log,
+	}).then(()=>{
+		masterUser.send("Hello! Your channel has been successfully created!");
+	})
+	
+}
+
 module.exports.closeChannel = closeChannel;
+module.exports.createChannel = createChannel;
