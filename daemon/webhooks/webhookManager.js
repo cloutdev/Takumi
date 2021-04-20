@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const db = require("../../tools/database");
 const {QueryTypes} = require('sequelize');
+const toolkit = require('../../tools/toolkit');
 
 async function processSellixWebhook(request, headers, discordClient){
 
@@ -43,14 +44,18 @@ async function processSellixWebhook(request, headers, discordClient){
 					});
 				}
 				)
-				
-				
-
 				break;
 			}
 		case "create":
 			{
 				console.log("I have to create a channel!");
+
+				const guildID = (body.data.custom_fields.guildID).substring(1);
+
+				const masterUserID = (body.data.custom_fields.masterUser).substring(1);
+
+				toolkit.createChannel(discordClient, guildID, masterUserID, "Webhook");
+
 				break;
 			}
 		
