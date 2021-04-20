@@ -9,6 +9,7 @@ module.exports = {
     description: "Resends the message", //the description of the command
 
     //running the command with the parameters: client, message, args, user, text, prefix
+    // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
         //EVERTHING in HERE CAN BE A PART OF THE COMMAND	
         message.channel.send(text) //you could also do:  message.channel.send(args.join(" "))
