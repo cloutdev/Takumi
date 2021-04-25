@@ -2,6 +2,8 @@ const axios = require("axios").default;
 const db = require("../../tools/database");
 const {QueryTypes} = require('sequelize');
 
+const webhookURL =  "";
+
 async function createExtensionProductID(channelID, email, discordGuild, days){
 	console.log("here");
 	console.log(channelID);
@@ -31,9 +33,9 @@ async function createExtensionProductID(channelID, email, discordGuild, days){
 			"action": "update",
 			"ChannelID": "C"+channelID.toString()
 		},
-		"webhook": "http://95844b3ee5b5.ngrok.io",
+		"webhook": webhookURL,
 		"white_label": false,
-		"return_url": "http://95844b3ee5b5.ngrok.io"
+		"return_url": webhookURL
 	}
 
 	console.log(payload);
@@ -85,9 +87,9 @@ async function createCreationProductID(email, discordGuild, masterUser, days){
 			"guildID": "G"+(discordGuild.id).toString(),
 			"masterUser" : "U"+(masterUser.id).toString()
 		},
-		"webhook": "https://95844b3ee5b5.ngrok.io",
+		"webhook": webhookURL,
 		"white_label": false,
-		"return_url": "https://95844b3ee5b5.ngrok.io"
+		"return_url": webhookURL
 	}
 
 	const sellixRequest = await axios({
