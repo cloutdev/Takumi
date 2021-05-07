@@ -2,7 +2,7 @@ const axios = require("axios").default;
 const db = require("../../tools/database");
 const {QueryTypes} = require('sequelize');
 
-const webhookURL =  "";
+const webhookURL =  "https://dbba25f3eddb.ngrok.io";
 
 async function createExtensionProductID(channelID, email, discordGuild, days){
 	console.log("here");
@@ -77,7 +77,7 @@ async function createCreationProductID(email, discordGuild, masterUser, days){
 	const payload = {
 		"title": `Shop creation in ${discordGuild.name}`,
 		"gateway": "bitcoin",
-		"value": guild.pricePerDay * 10,
+		"value": guild.pricePerDay,
 		"currency": "USD",
 		"quantity": days,
 		"confirmations": 1,
