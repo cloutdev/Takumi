@@ -1,0 +1,9 @@
+{
+  "token": "ODQwMTczNTE4NjAzMDI2NDUz.YJUWkA.ia9N1oTwkoZMOxgVJlMh9BahVjk",
+  "prefix": "$",
+  "dbUsername": "root",
+  "dbPassword" : "",
+  "dbName" : "marketplacebot2",
+  "dbHost" : "localhost",
+  "minimumInvoicePrice": 1
+}
