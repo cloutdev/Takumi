@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.5.2
+-- version 5.0.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: May 07, 2021 at 10:35 AM
--- Server version: 10.1.21-MariaDB
--- PHP Version: 7.1.1
+-- Φιλοξενητής: 127.0.0.1
+-- Χρόνος δημιουργίας: 07 Μάη 2021 στις 17:01:27
+-- Έκδοση διακομιστή: 10.4.14-MariaDB
+-- Έκδοση PHP: 7.2.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 
@@ -17,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `marketplacebot`
+-- Βάση δεδομένων: `marketplacebot`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `channels`
+-- Δομή πίνακα για τον πίνακα `channels`
 --
 
 CREATE TABLE `channels` (
@@ -32,50 +33,29 @@ CREATE TABLE `channels` (
   `channelID` varchar(18) COLLATE utf8mb4_bin DEFAULT NULL,
   `createdBy` varchar(18) COLLATE utf8mb4_bin NOT NULL,
   `masterUser` varchar(18) COLLATE utf8mb4_bin NOT NULL,
-  `tagsPerDay` tinyint(3) NOT NULL DEFAULT '1',
-  `createdOn` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `tagsPerDay` tinyint(3) NOT NULL DEFAULT 1,
+  `createdOn` datetime NOT NULL DEFAULT current_timestamp(),
   `startsOn` datetime NOT NULL,
   `expiresOn` datetime NOT NULL,
-  `isClosed` tinyint(1) NOT NULL DEFAULT '0'
+  `isClosed` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `channels`
+-- Άδειασμα δεδομένων του πίνακα `channels`
 --
 
 INSERT INTO `channels` (`id`, `guildID`, `channelID`, `createdBy`, `masterUser`, `tagsPerDay`, `createdOn`, `startsOn`, `expiresOn`, `isClosed`) VALUES
-(1, '830004874548740116', '830067357039853579', '191478373975982082', '191478373975982082', 1, '2021-04-09 13:11:19', '2021-04-09 13:11:19', '2021-04-09 13:12:19', 1),
-(2, '830004874548740116', '830068514722676766', '241897454507655168', '241897454507655168', 1, '2021-04-09 13:15:55', '2021-04-09 13:15:55', '2021-04-09 13:16:55', 1),
-(3, '830004874548740116', '830069286445514753', '241897454507655168', '241897454507655168', 1, '2021-04-09 13:18:59', '2021-04-09 13:18:59', '2021-04-09 13:19:59', 1),
-(4, '830004874548740116', '830070336434339880', '191478373975982082', '191478373975982082', 1, '2021-04-09 13:23:09', '2021-04-09 13:23:09', '2021-04-09 13:24:09', 1),
-(5, '830004874548740116', '830070565821087776', '191478373975982082', '191478373975982082', 1, '2021-04-09 13:24:04', '2021-04-09 13:24:04', '2021-04-09 13:25:04', 1),
-(6, '830004874548740116', '830071872670269541', '830004672197689396', '830004672197689396', 1, '2021-04-09 13:29:15', '2021-04-09 13:29:15', '2021-04-09 13:30:15', 1),
-(7, '830004874548740116', '830072098865152030', '830004672197689396', '830004672197689396', 1, '2021-04-09 13:30:09', '2021-04-09 13:30:09', '2021-04-09 13:31:09', 1),
-(8, '830004874548740116', '830219350740828170', '191478373975982082', '191478373975982082', 1, '2021-04-09 23:15:17', '2021-04-09 23:15:17', '2021-04-09 23:25:17', 1),
-(9, '830004874548740116', '830557299932004372', '191478373975982082', '191478373975982082', 1, '2021-04-10 21:38:10', '2021-04-10 21:38:10', '2021-04-10 21:39:10', 1),
-(10, '830004874548740116', '830557640819736636', '191478373975982082', '191478373975982082', 1, '2021-04-10 21:39:31', '2021-04-10 21:39:31', '2021-04-10 21:40:31', 1),
-(11, '830004874548740116', '830558032496558090', '191478373975982082', '191478373975982082', 1, '2021-04-10 21:41:05', '2021-04-10 21:41:05', '2021-04-10 21:42:05', 1),
-(12, '830004874548740116', '830558619389001759', '191478373975982082', '191478373975982082', 1, '2021-04-10 21:43:25', '2021-04-10 21:43:25', '2021-04-10 21:44:25', 1),
-(13, '830004874548740116', '830559807454445640', '191478373975982082', '191478373975982082', 1, '2021-04-10 21:48:08', '2021-04-10 21:48:08', '2022-01-19 21:49:08', 0),
-(14, '830004874548740116', '830565003743985675', '191478373975982082', '191478373975982082', 1, '2021-04-10 22:08:47', '2021-04-10 22:08:47', '2021-04-10 22:09:47', 1),
-(15, '830004874548740116', '830815447015620648', 'Webhook', '191478373975982082', 1, '2021-04-11 14:43:59', '2021-04-11 14:43:59', '2021-04-11 14:44:59', 1),
-(16, '830004874548740116', '830817853254795264', 'Webhook', '191478373975982082', 1, '2021-04-11 14:53:32', '2021-04-11 14:53:32', '2021-04-11 14:54:32', 1),
-(17, '830004874548740116', '830818049631322132', 'Webhook', '191478373975982082', 1, '2021-04-11 14:54:19', '2021-04-11 14:54:19', '2021-04-11 14:55:19', 1),
-(18, '830004874548740116', '830818147312861204', 'Webhook', '191478373975982082', 1, '2021-04-11 14:54:43', '2021-04-11 14:54:43', '2021-04-11 14:55:43', 1),
-(19, '830004874548740116', '830818571461328936', 'Webhook', '191478373975982082', 1, '2021-04-11 14:56:24', '2021-04-11 14:56:24', '2021-04-11 14:57:24', 1),
-(20, '830004874548740116', '830822813136846849', '191478373975982082', '191478373975982082', 1, '2021-04-11 15:13:15', '2021-04-11 15:13:15', '2021-04-11 15:14:15', 1),
-(21, '830004874548740116', '830823135905447967', '191478373975982082', '191478373975982082', 1, '2021-04-11 15:14:32', '2021-04-11 15:14:32', '2021-04-11 15:15:32', 1),
-(22, '830004874548740116', '830832760637489202', 'Webhook', '191478373975982082', 1, '2021-04-11 15:52:46', '2021-04-11 15:52:46', '2021-04-11 15:53:46', 1),
-(23, '830004874548740116', '836674773517205555', '831480672626933770', '831480672626933770', 1, '2021-04-27 18:46:50', '2021-04-27 18:46:50', '2021-04-27 18:51:50', 1),
-(24, '830004874548740116', '836675375886761995', '831480672626933770', '831480672626933770', 1, '2021-04-27 18:49:13', '2021-04-27 18:49:13', '2021-04-27 18:55:13', 1),
-(25, '830004874548740116', '836676373782986832', '831480672626933770', '831480672626933770', 1, '2021-04-27 18:53:11', '2021-04-27 18:53:11', '2021-05-19 19:21:11', 0),
-(26, '830004874548740116', '836677337521062008', 'Webhook', '831480672626933770', 1, '2021-04-27 18:57:01', '2021-04-27 18:57:01', '2021-04-27 18:58:01', 1),
-(27, '830004874548740116', '836678605130956832', 'Webhook', '831480672626933770', 1, '2021-04-27 19:02:03', '2021-04-27 19:02:03', '2021-04-27 19:03:03', 1);
+(1, '840173865467641877', '840194125009387520', '839768031805702154', '839768031805702154', 1, '2021-05-07 11:51:29', '2021-05-07 11:51:29', '2021-05-07 11:52:29', 1),
+(2, '840173865467641877', '840217747722993694', 'Webhook', '839768031805702154', 1, '2021-05-07 13:25:21', '2021-05-07 13:25:21', '2021-05-07 13:26:21', 1),
+(3, '840173865467641877', '840218499732471828', 'Webhook', '839768031805702154', 1, '2021-05-07 13:28:20', '2021-05-07 13:28:20', '2021-05-07 13:29:20', 1),
+(4, '840173865467641877', '840218873243369533', 'Webhook', '839768031805702154', 1, '2021-05-07 13:29:49', '2021-05-07 13:29:49', '2021-05-07 13:30:49', 1),
+(5, '840173865467641877', '840219356831023115', 'Webhook', '839768031805702154', 1, '2021-05-07 13:31:44', '2021-05-07 13:31:44', '2021-05-07 13:32:44', 1),
+(6, '840173865467641877', '840220010495344660', 'Webhook', '839768031805702154', 1, '2021-05-07 13:34:20', '2021-05-07 13:34:20', '2021-05-07 13:35:20', 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `mods`
+-- Δομή πίνακα για τον πίνακα `mods`
 --
 
 CREATE TABLE `mods` (
@@ -83,11 +63,11 @@ CREATE TABLE `mods` (
   `channelID` varchar(18) COLLATE utf8mb4_bin NOT NULL,
   `modID` varchar(18) COLLATE utf8mb4_bin NOT NULL,
   `addedBy` varchar(18) COLLATE utf8mb4_bin NOT NULL,
-  `addedOn` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
+  `addedOn` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `mods`
+-- Άδειασμα δεδομένων του πίνακα `mods`
 --
 
 INSERT INTO `mods` (`id`, `channelID`, `modID`, `addedBy`, `addedOn`) VALUES
@@ -104,18 +84,18 @@ INSERT INTO `mods` (`id`, `channelID`, `modID`, `addedBy`, `addedOn`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `sentpings`
+-- Δομή πίνακα για τον πίνακα `sentpings`
 --
 
 CREATE TABLE `sentpings` (
   `id` int(11) NOT NULL,
   `channelID` varchar(18) COLLATE utf8mb4_bin NOT NULL,
-  `sentOn` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `sentOn` datetime NOT NULL DEFAULT current_timestamp(),
   `sentBy` varchar(18) COLLATE utf8mb4_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `sentpings`
+-- Άδειασμα δεδομένων του πίνακα `sentpings`
 --
 
 INSERT INTO `sentpings` (`id`, `channelID`, `sentOn`, `sentBy`) VALUES
@@ -128,7 +108,7 @@ INSERT INTO `sentpings` (`id`, `channelID`, `sentOn`, `sentBy`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `settings`
+-- Δομή πίνακα για τον πίνακα `settings`
 --
 
 CREATE TABLE `settings` (
@@ -138,67 +118,74 @@ CREATE TABLE `settings` (
   `publicBotChannel` varchar(18) COLLATE utf8mb4_bin NOT NULL,
   `privateBotChannel` varchar(18) COLLATE utf8mb4_bin NOT NULL,
   `owner` varchar(18) COLLATE utf8mb4_bin NOT NULL,
+  `isActive` tinyint(1) NOT NULL DEFAULT 1,
   `pricePerDay` decimal(15,2) NOT NULL,
+  `minimumDays` smallint(6) NOT NULL,
   `sellixAPIKey` varchar(64) COLLATE utf8mb4_bin NOT NULL,
   `sellixSecret` varchar(255) COLLATE utf8mb4_bin NOT NULL,
   `botImg` varchar(255) COLLATE utf8mb4_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `settings`
+-- Άδειασμα δεδομένων του πίνακα `settings`
 --
 
-INSERT INTO `settings` (`guildID`, `openCategoryID`, `closedCategoryID`, `publicBotChannel`, `privateBotChannel`, `owner`, `pricePerDay`, `sellixAPIKey`, `sellixSecret`, `botImg`) VALUES
-('469140702975098900', '469140702975098900', '829813376015925308', '469140702975098902', '761872155327070259', '191478373975982082', '0.00', '', '', 'https://discordjs.guide/favicon.png'),
-('830004874548740116', '830045438416912384', '830045439424069662', '830004874548740119', '830007003384381440', '830004672197689396', '0.50', 'Bg8FMtrjGOyL9Pdr1FY84pC0xPp1acUtcWgASqcmsd7Oub7oBc4eY7fccE4wpMrx', '3pHyz1Ux8S9Iiy5BBMJNsBJtmnLHezgk', 'gay');
+INSERT INTO `settings` (`guildID`, `openCategoryID`, `closedCategoryID`, `publicBotChannel`, `privateBotChannel`, `owner`, `isActive`, `pricePerDay`, `minimumDays`, `sellixAPIKey`, `sellixSecret`, `botImg`) VALUES
+('469140702975098900', '469140702975098900', '829813376015925308', '469140702975098902', '761872155327070259', '191478373975982082', 0, '0.00', 0, '', '', 'https://discordjs.guide/favicon.png'),
+('830004874548740116', '830045438416912384', '830045439424069662', '830004874548740119', '830007003384381440', '830004672197689396', 0, '0.50', 10, 'Bg8FMtrjGOyL9Pdr1FY84pC0xPp1acUtcWgASqcmsd7Oub7oBc4eY7fccE4wpMrx', '3pHyz1Ux8S9Iiy5BBMJNsBJtmnLHezgk', 'gay'),
+('840173865467641877', '840191490965504000', '840191495268597772', '840173865929277442', '840190808896045107', '839768031805702154', 1, '10.00', 10, 'Bg8FMtrjGOyL9Pdr1FY84pC0xPp1acUtcWgASqcmsd7Oub7oBc4eY7fccE4wpMrx', '3pHyz1Ux8S9Iiy5BBMJNsBJtmnLHezgk', 'gay');
 
 --
--- Indexes for dumped tables
+-- Ευρετήρια για άχρηστους πίνακες
 --
 
 --
--- Indexes for table `channels`
+-- Ευρετήρια για πίνακα `channels`
 --
 ALTER TABLE `channels`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `mods`
+-- Ευρετήρια για πίνακα `mods`
 --
 ALTER TABLE `mods`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `sentpings`
+-- Ευρετήρια για πίνακα `sentpings`
 --
 ALTER TABLE `sentpings`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `settings`
+-- Ευρετήρια για πίνακα `settings`
 --
 ALTER TABLE `settings`
   ADD PRIMARY KEY (`guildID`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT για άχρηστους πίνακες
 --
 
 --
--- AUTO_INCREMENT for table `channels`
+-- AUTO_INCREMENT για πίνακα `channels`
 --
 ALTER TABLE `channels`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
 --
--- AUTO_INCREMENT for table `mods`
+-- AUTO_INCREMENT για πίνακα `mods`
 --
 ALTER TABLE `mods`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
 --
--- AUTO_INCREMENT for table `sentpings`
+-- AUTO_INCREMENT για πίνακα `sentpings`
 --
 ALTER TABLE `sentpings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+COMMIT;
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
