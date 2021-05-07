@@ -182,14 +182,8 @@ module.exports = {
               .setURL(sellixResponseBody.data.url);
             
             user.send(successfulWebhookReceivedEmbed);
-
-            //user.send(`when you press on the following link, you will be redirected to a Sellix payment webpage, that when paid, will create a new shop, with the days of subscription time that you requested.  \n ${sellixResponseBody.data.url}`);
           }
-          
-          
 
-          
-          
           if(sellixResponseBody === undefined){
             message.reply("There has been a problem with your request. Please check your inputs and try again.")
           }else{
