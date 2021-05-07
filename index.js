@@ -96,23 +96,16 @@ client.on("message", async message => {
 
 client.on('ready', async function(){
 
-	/*
-
-	await client.channels.fetch('829822754819538965').then((channel)=>{
-		toolkit.closeChannel(channel,client);
-	}).catch(console.log("here is error"));
-
-	*/
-
 	webhookListener.startServer(client);
 
-	const allGuilds = await db.query("SELECT * from settings",{
+	const allGuilds = await db.query("SELECT * from settings WHERE isActive = 1",{
         type: QueryTypes.SELECT,
 	});
 	setInterval(() => {
 		allGuilds.forEach((guild) => {
 			checkChannels.periodicCheckForChannels(client, guild);
 		});
+		console.log("Checking...");
 	}, 3000);
 });
 
