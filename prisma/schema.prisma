@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model channels {
+  id         Int      @id @default(autoincrement())
+  guildID    String   @db.VarChar(18)
+  categoryID String   @db.VarChar(18)
+  channelID  String?  @db.VarChar(18)
+  createdBy  String   @db.VarChar(18)
+  masterUser String   @db.VarChar(18)
+  tagsPerDay Int      @default(1) @db.TinyInt
+  createdOn  DateTime @default(now()) @db.DateTime(0)
+  startsOn   DateTime @db.DateTime(0)
+  expiresOn  DateTime @db.DateTime(0)
+  isClosed   Boolean  @default(false)
+}
+
+model mods {
+  id        Int      @id @default(autoincrement())
+  channelID String   @db.VarChar(18)
+  modID     String   @db.VarChar(18)
+  addedBy   String   @db.VarChar(18)
+  addedOn   DateTime @default(now()) @db.DateTime(0)
+}
+
+model sentpings {
+  id        Int      @id @default(autoincrement())
+  channelID String   @db.VarChar(18)
+  sentOn    DateTime @default(now()) @db.DateTime(0)
+  sentBy    String   @db.VarChar(18)
+}
+
+model settings {
+  guildID           String  @id @db.VarChar(18)
+  closedCategoryID  String  @db.VarChar(18)
+  publicBotChannel  String  @db.VarChar(18)
+  privateBotChannel String  @db.VarChar(18)
+  owner             String  @db.VarChar(18)
+  adminRoleID       String  @db.VarChar(18)
+  isActive          Boolean @default(true)
+  pricePerDay       Decimal @db.Decimal(15, 2)
+  minimumDays       Int     @db.SmallInt
+  sellixAPIKey      String  @db.VarChar(64)
+  sellixSecret      String  @db.VarChar(255)
+}
+
+model categories {
+  id                          Int     @id @default(autoincrement())
+  guildID                     String  @db.VarChar(18)
+  CategoryID                  String  @db.VarChar(18)
+  BasePingsPerDay             Int     @db.SmallInt
+  pricePerDay                 Decimal @db.Decimal(15, 2)
+  minimumDays                 Int     @db.SmallInt
+  maximumAmountOfChannels     Int     @db.SmallInt
+  pingAddonPurchasesAvailable Boolean
+}

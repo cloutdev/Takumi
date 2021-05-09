@@ -1,9 +1,9 @@
 {
   "token": "ODQwMTczNTE4NjAzMDI2NDUz.YJUWkA.ia9N1oTwkoZMOxgVJlMh9BahVjk",
   "prefix": "$",
-  "dbUsername": "root",
-  "dbPassword" : "",
-  "dbName" : "marketplacebot2",
-  "dbHost" : "localhost",
+  "dbUsername": "Clout",
+  "dbPassword" : "13021302Pa",
+  "dbName" : "MarketplaceBot",
+  "dbHost" : "194.127.178.182",
   "minimumInvoicePrice": 1
 }
