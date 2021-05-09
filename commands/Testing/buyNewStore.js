@@ -3,8 +3,9 @@ const webhookSender = require("../../daemon/webhooks/webhookSender");
 const emailValidator = require('email-validator');
 const Discord = require("discord.js");
 const config = require("../../config.json");
-const {QueryTypes} = require('sequelize');
-const db = require("../../tools/database");
+const { PrismaClient } = require('@prisma/client')
+
+const prisma = new PrismaClient()
 
 module.exports = {
   //definition
@@ -23,11 +24,11 @@ module.exports = {
     let userEmail;
     let amountOfDays;
     
-    const guildData = (await db.query("SELECT * FROM settings where guildID = ? LIMIT 1",{
-      replacements: [message.guild.id],
-      type: QueryTypes.SELECT,
-      logging: console.log,
-    }))[0];
+    const guildData = await prisma.settings.findUnique({
+      where: {
+        guildID: message.guild.id
+      }
+    });
     
     const checkDMsEmbed = new Discord.MessageEmbed()
     .setColor('#0099ff')

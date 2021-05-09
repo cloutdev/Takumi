@@ -1,3 +1,7 @@
+const { PrismaClient } = require('@prisma/client')
+
+const prisma = new PrismaClient()
+
 //Here the command starts
 module.exports = {
     //definition
@@ -11,6 +15,10 @@ module.exports = {
     //running the command with the parameters: client, message, args, user, text, prefix
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
-        
+        console.log(await prisma.channels.count({
+            where: {
+                channelID: '840329309743087627'
+            }
+        }))
     }
 }

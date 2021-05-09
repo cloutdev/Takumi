@@ -1,16 +1,20 @@
-const db = require("../tools/database");
-const {QueryTypes} = require('sequelize');
 const toolkit = require("../tools/toolkit");
+const prisma = require("../tools/prisma");
 
 async function periodicCheckForChannels(client, guildSettings){
 
 	const generalChannel = client.channels.cache.find(channel => channel.id === guildSettings.privateBotChannel);
 
-	const expiredChannels = await db.query("SELECT * from channels where expiresOn < now() AND isClosed = 0 AND guildID = ?",{
-		replacements: [guildSettings.guildID],
-		type: QueryTypes.SELECT,
-		logging: false,
+	const expiredChannels = await prisma.channels.findMany({
+		where: {
+			expiresOn:{
+				lte: new Date()
+			},
+			isClosed: false,
+			guildID: guildSettings.guildID
+		}
 	});
+	console.log(expiredChannels)
 
 	expiredChannels.forEach((databaseChannel) => {
 		client.channels.fetch(databaseChannel.channelID).then((channel)=>{
