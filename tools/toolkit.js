@@ -1,6 +1,9 @@
 const db = require("../tools/database");
 const {QueryTypes} = require('sequelize');
 const moment = require('moment');
+const prisma = require("../tools/prisma");
+const Discord = require('discord.js')
+
 async function closeChannel(channelToBeClosed, reason, discordClient){
 
 	const modArray = (await db.query("SELECT * from mods WHERE channelID = ?",{
@@ -48,25 +51,20 @@ async function closeChannel(channelToBeClosed, reason, discordClient){
 	});
 }
 
-async function createChannel(discordClient, guildID, masterUserID, createdBy){
+async function createChannel(discordClient, guildID, masterUserID, createdBy, categoryID){
 
 	const discordGuild = await discordClient.guilds.fetch(guildID);
 
 	const masterUser = await discordClient.users.fetch(masterUserID);
-
-	const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
-		replacements: [guildID],
-		type: QueryTypes.SELECT,
-	}))[0];
 
 	const channelName = `${masterUser.username}'s Store`;
 	const channelDesc = `This shop was opened on ${moment()}`;
 	
 	const createdChannelID = await discordGuild.channels.create(channelName,{
 		topic : channelDesc,
-		parent: guild.openCategoryID,
+		parent: categoryID,
 	}).then((channel)=>{
-		channel.updateOverwrite(masterUserID, 
+		channel.updateOverwrite(masterUserID,
 			{
 				'MANAGE_CHANNELS': true,
 				'SEND_MESSAGES': true,
@@ -82,16 +80,184 @@ async function createChannel(discordClient, guildID, masterUserID, createdBy){
 		return;
 	});
 
-
-	await db.query('INSERT INTO channels (guildID, channelID, createdBy, masterUser, startsOn, expiresOn) values (?, ?, ?, ?, now(), DATE_ADD(now(), INTERVAL ? MINUTE))',{
-		replacements: [guildID, createdChannelID, createdBy, masterUserID, 1],
-		type: QueryTypes.INSERT,
-		logging: console.log,
+	prisma.channels.create({
+		data: {
+			guildID: guildID,
+			categoryID: categoryID,
+			channelID: createdChannelID,
+			createdBy: createdBy,
+			masterUser: masterUserID,
+			startsOn: moment().toISOString(),
+			expiresOn: moment().add(1, 'minute').toISOString()
+		}
 	}).then(()=>{
 		masterUser.send("Hello! Your channel has been successfully created!");
 	})
-	
 }
+
+async function createCategory(discordUser, discordGuild){
+	const embed = new Discord.MessageEmbed()
+	.setColor('#0099ff')
+	.setTitle('Create new Shop Category')
+	.setDescription('We will guide you through creating a new shop category. Please do not do anything manually! We take care of everything through our bot.')
+	
+	discordUser.send(embed);
+	
+	const filter = response => {
+		return (response.author.id === discordUser.id)
+	}
+	const questions = [
+		"How many pings do you want shops to make per day?", 
+		"What will be the price for the shops in this category per day?", 
+		"What will be the minimum days for which a user will be able to buy a shop?", 
+		"What do you want the maximum amount of open shops to be?"
+	];
+	let answers = {};
+	
+	for (const question of questions) {
+		const QuestionEmbed = new Discord.MessageEmbed()
+		.setColor('#0099ff')
+		.setTitle(question)
+		.setDescription('We need this to create a new shop category for you.')
+		
+		let valueCheck;
+		
+		await discordUser.send(QuestionEmbed).then(async function(sentEmbed){
+			await sentEmbed.channel.awaitMessages(filter, { max: 1, time: 30000, errors: ['time'] })
+			.then((receivedMessages)=>{
+				const submittedValue = receivedMessages.first().content;
+				if(isNaN(submittedValue)){
+					throw 'NaN';
+				}
+				if(submittedValue < 0){
+					throw 'LessThanZero';
+				}
+				
+				answers[question] = submittedValue;
+				valueCheck = submittedValue;
+				const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('Thanks! We have successfully received your input.')
+				sentEmbed.channel.send(embed);
+			})
+			.catch((err)=>{
+				const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('Oops! We stumbled upon an Error!')
+				.setDescription('There has been an error while processing your request.\n\n'+
+				'Maybe you did not enter a valid number, or you did not supply any number in the designated amount of time.')
+				
+				if((err === "NaN") && (err === "LessThanZero")){
+					embed.addField("Error", "The answer you submitted is not a number.")
+				}
+				
+				console.log(err);
+				sentEmbed.channel.send(embed);
+				
+				return;
+			});
+		});
+		if (valueCheck === undefined) return;
+	}
+	questions.push("Should users be able to buy ping addons?");
+	const pingAddonQuestion = "Should users be able to buy ping addons?";
+	const pingAddonEmbed = new Discord.MessageEmbed()
+	.setColor('#0099ff')
+	.setTitle(pingAddonQuestion)
+	.setDescription('We need this to create a new shop category for you. Please press on the react you would like.')
+	
+	let valueCheck;
+	await discordUser.send(pingAddonEmbed).then(async function(sentEmbed){
+		await sentEmbed.react("✅");
+		await sentEmbed.react("❌");
+
+		const emoteFilter = (reaction, user) => (reaction.emoji.name === "✅" || reaction.emoji.name === "❌") && user.id == discordUser.id;
+
+		await sentEmbed.awaitReactions(emoteFilter, { max: 1, time: 30000, errors: ['time'] })
+		.then((receivedMessages)=>{
+			const submittedValue = receivedMessages.first().emoji.name;
+			if(submittedValue === "✅"){
+				answers[pingAddonQuestion] = true;
+			}else if(submittedValue === "❌"){
+				answers[pingAddonQuestion] = false;
+			}
+
+			valueCheck = submittedValue;
+			const embed = new Discord.MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Thanks! We have successfully received your input.')
+			sentEmbed.channel.send(embed);
+		})
+		.catch((err)=>{
+			const embed = new Discord.MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Oops! We stumbled upon an Error!')
+			.setDescription('There has been an error while processing your request.\n\n'+
+			'Maybe you did not enter a valid number, or you did not supply any number in the designated amount of time.')
+
+			if(err.size === 0){
+				embed.addField("Error", "We did not receive any messages in the specified time window. Please reenter the command and try again.");
+			}
+
+			console.log(err);
+			sentEmbed.channel.send(embed);
+			
+			return;
+		});
+	});
+	if (valueCheck === undefined) return;
+	
+	console.log(answers)
+	
+	let valuesJSON = [];
+	
+	for (const question of questions) {
+		valuesJSON.push({name: question, value: answers[question], inline: true})
+	}
+	
+	const successEmbed = new Discord.MessageEmbed()
+	.setColor('#0099ff')
+	.setTitle('We will now create your category automatically!')
+	.setDescription('You can change its title and physical position in whichever way you want to achieve the amount of exposure you personally would want.')
+	.addFields(valuesJSON)
+		
+	discordUser.send(successEmbed);
+
+	await discordGuild.channels.create(new Date(),{
+		type: 'category',
+		permissionOverwrites: [
+			{
+				id: discordGuild.id,
+				deny: ["SEND_MESSAGES", "MENTION_EVERYONE"],
+				allow: ["ADD_REACTIONS"]
+			}
+		]
+	}).then((createdCategory)=>{
+		prisma.categories.create({
+			data: {
+				CategoryID: createdCategory.id,
+				guildID: discordGuild.id,
+				BasePingsPerDay: parseInt(answers["How many pings do you want shops to make per day?"]),
+				pricePerDay: parseFloat(answers["What will be the price for the shops in this category per day?"]).toFixed(2),
+				minimumDays: parseInt(answers["What will be the minimum days for which a user will be able to buy a shop?"]),
+				maximumAmountOfChannels: parseInt(answers["What do you want the maximum amount of open shops to be?"]),
+				pingAddonPurchasesAvailable: answers["Should users be able to buy ping addons?"]
+			}
+		}).then(()=>{
+			const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('Your category has been created!')
+				.setDescription('You can now modify it in whichever way you would like! You are welcome to change its location and title to your needs!')
+				.addFields(
+					{ name: 'Category Name', value: createdCategory.name, inline: true },
+					{ name: 'Category ID', value: createdCategory.id, inline: true },
+				)
+			discordUser.send(embed)
+		})
+	})
+}
+
 
 module.exports.closeChannel = closeChannel;
 module.exports.createChannel = createChannel;
+module.exports.createCategory = createCategory;
