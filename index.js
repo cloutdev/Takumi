@@ -1,9 +1,7 @@
 //Modules
-const db = require("./tools/database");
-const {QueryTypes} = require('sequelize');
 const webhookListener = require("./daemon/webhooks/webhookListener");
 //const toolkit = require("./tools/toolkit");
-
+const prisma = require('./tools/prisma')
 const { Client, Collection } = require("discord.js");
 const checkChannels = require('./daemon/checkChannels');
 const config = require("./config.json"); //loading config file with token and prefix
@@ -98,9 +96,17 @@ client.on('ready', async function(){
 
 	webhookListener.startServer(client);
 
+	const allGuilds = await prisma.settings.findMany({
+		where:{
+			isActive: true
+		}
+	})
+
+	/*
 	const allGuilds = await db.query("SELECT * from settings WHERE isActive = 1",{
         type: QueryTypes.SELECT,
 	});
+	*/
 	setInterval(() => {
 		allGuilds.forEach((guild) => {
 			checkChannels.periodicCheckForChannels(client, guild);
