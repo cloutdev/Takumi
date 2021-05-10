@@ -1,6 +1,6 @@
 const db = require("../../tools/database");
 const {QueryTypes} = require('sequelize');
-
+const prisma = require('../../tools/prisma')
 //Here the command starts
 module.exports = {
     //definition
@@ -12,13 +12,20 @@ module.exports = {
     description: "Gives you information on how fast the Bot can respond to you", //the description of the command
 
     //running the command with the parameters: client, message, args, user, text, prefix
+    // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
 
-		const dbChannel = (await db.query("SELECT * from channels WHERE channelID = ?",{
+		const dbChannel = await prisma.channels.findFirst({
+			where:{
+				channelID: message.channel.id
+			}
+		})
+
+		/*const dbChannel = (await db.query("SELECT * from channels WHERE channelID = ?",{
 			replacements: [message.channel.id],
 			type: QueryTypes.SELECT,
 			logging: false,
-		}))[0];
+		}))[0];*/
 
 		if(user.id != dbChannel.masterUser){
 			message.reply("You must be a master user to do that!");
