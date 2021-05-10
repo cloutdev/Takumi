@@ -4,6 +4,6 @@
   "dbUsername": "Clout",
   "dbPassword" : "13021302Pa",
   "dbName" : "MarketplaceBot",
-  "dbHost" : "194.127.178.182",
+  "dbHost" : "172.104.157.28",
   "minimumInvoicePrice": 1
 }

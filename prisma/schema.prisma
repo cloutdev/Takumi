@@ -55,6 +55,7 @@ model categories {
   guildID                     String  @db.VarChar(18)
   CategoryID                  String  @db.VarChar(18)
   BasePingsPerDay             Int     @db.SmallInt
+  pingAddonPrice              Decimal @db.Decimal(15, 2)
   pricePerDay                 Decimal @db.Decimal(15, 2)
   minimumDays                 Int     @db.SmallInt
   maximumAmountOfChannels     Int     @db.SmallInt
