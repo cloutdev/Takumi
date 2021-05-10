@@ -1,5 +1,4 @@
-const db = require("../../tools/database.js");
-const {QueryTypes} = require('sequelize');
+const prisma = require("../../tools/prisma");
 //Here the command starts
 module.exports = {
     //definition
@@ -14,18 +13,34 @@ module.exports = {
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
 
-		const nonExpiredChannels = await db.query("SELECT * from channels where expiresOn > now() AND isClosed = 0",{
+		const nonExpiredChannels = await prisma.channels.findMany({
+			where:{
+				expiresOn: {gte: new Date()},
+				isClosed: false
+			}
+		})
+
+		/*const nonExpiredChannels = await db.query("SELECT * from channels where expiresOn > now() AND isClosed = 0",{
 			type: QueryTypes.SELECT,
 			logging: console.log,
-		});
+		});*/
 
 		console.log("Channels that DONT need to be closed:");
 		console.log(nonExpiredChannels);
 		
-		const expiredChannels = await db.query("SELECT * from channels where expiresOn <= now() and isClosed  = 0",{
+		const expiredChannels = await prisma.channels.findMany({
+			where:{
+				expiresOn:{
+					lte: new Date()
+				},
+				isClosed: false
+			}
+		})
+
+		/*const expiredChannels = await db.query("SELECT * from channels where expiresOn <= now() and isClosed  = 0",{
 			type: QueryTypes.SELECT,
 			logging: console.log,
-		});
+		});*/
 
 		console.log("Channels that need to be closed:");
 		console.log(expiredChannels);

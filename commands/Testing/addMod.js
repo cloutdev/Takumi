@@ -1,5 +1,4 @@
-const db = require("../../tools/database");
-const {QueryTypes} = require('sequelize');
+const prisma = require('../../tools/prisma')
 
 //Here the command starts
 module.exports = {
@@ -14,11 +13,12 @@ module.exports = {
     //running the command with the parameters: client, message, args, user, text, prefix
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
-		const dbChannel = (await db.query("SELECT * from channels WHERE channelID = ?",{
-			replacements: [message.channel.id],
-			type: QueryTypes.SELECT,
-			logging: false,
-		}))[0];
+
+		const dbChannel = await prisma.channels.findFirst({
+			where: {
+				channelID: message.channel.id
+			}
+		})
 
 		if(dbChannel === undefined){
 			message.reply("you are not in a valid channel!");
@@ -41,10 +41,12 @@ module.exports = {
 				}
 			);
 
-			db.query('INSERT INTO mods (channelID, modID, addedBy) values (?, ?, ?)',{
-				replacements: [message.channel.id, mod.id, user.id],
-				type: QueryTypes.INSERT,
-				logging: console.log,
+			prisma.mods.create({
+				data:{
+					channelID: message.channel.id,
+					modID: mod.id,
+					addedBy: user.id
+				}
 			})
 		});
 
