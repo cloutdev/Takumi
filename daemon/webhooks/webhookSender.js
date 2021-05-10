@@ -1,8 +1,9 @@
 const axios = require("axios").default;
 const db = require("../../tools/database");
 const {QueryTypes} = require('sequelize');
+const prisma = require('../../tools/prisma')
 
-const webhookURL =  "https://dbba25f3eddb.ngrok.io";
+const webhookURL =  "https://b6b923419856.ngrok.io";
 
 async function createExtensionProductID(channelID, email, discordGuild, days){
 	console.log("here");
@@ -66,18 +67,25 @@ async function createExtensionProductID(channelID, email, discordGuild, days){
 	return await sellixRequest;
 }
 
-async function createCreationProductID(email, discordGuild, masterUser, days){
+async function createCreationProductID(email, discordGuild, masterUser, days, discordCategory){
 
-	const guild = (await db.query("SELECT * from settings WHERE guildID = ?",{
-		replacements: [discordGuild.id],
-		type: QueryTypes.SELECT,
-		logging: false,
-	}))[0]; 
+	const guild = await prisma.settings.findUnique({
+		where: {
+			guildID: discordGuild.id
+		}
+	})
+
+	const category = await prisma.categories.findFirst({
+		where: {
+			CategoryID: discordCategory.id
+		}
+	})
+
 
 	const payload = {
-		"title": `Shop creation in ${discordGuild.name}`,
+		"title": `Shop creation in the ${discordCategory.name} category of ${discordGuild.name}`,
 		"gateway": "bitcoin",
-		"value": guild.pricePerDay,
+		"value": category.pricePerDay,
 		"currency": "USD",
 		"quantity": days,
 		"confirmations": 1,
@@ -85,12 +93,15 @@ async function createCreationProductID(email, discordGuild, masterUser, days){
 		"custom_fields":  {
 			"action": "create",
 			"guildID": "G"+(discordGuild.id).toString(),
-			"masterUser" : "U"+(masterUser.id).toString()
+			"masterUser" : "U"+(masterUser.id).toString(),
+			"categoryID": "C"+discordCategory.id
 		},
 		"webhook": webhookURL,
 		"white_label": false,
 		"return_url": webhookURL
 	}
+
+	console.log(payload)
 
 	const sellixRequest = await axios({
 		method: "POST",
@@ -100,7 +111,7 @@ async function createCreationProductID(email, discordGuild, masterUser, days){
 			"User-Agent": "MarketplaceBotWebhooks",
 			"Authorization" : `Bearer ${guild.sellixAPIKey}`,
 		}
-})
+	})
 	.then((res)=>{
 		if(res.data.status != 200){
 			console.log(res);

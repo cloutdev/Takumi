@@ -54,7 +54,9 @@ async function processSellixWebhook(request, headers, discordClient){
 
 				const masterUserID = (body.data.custom_fields.masterUser).substring(1);
 
-				toolkit.createChannel(discordClient, guildID, masterUserID, "Webhook");
+				const categoryID = (body.data.custom_fields.categoryID).substring(1);
+				
+				toolkit.createChannel(discordClient, guildID, masterUserID, "Webhook", categoryID);
 
 				break;
 			}
