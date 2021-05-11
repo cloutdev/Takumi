@@ -61,6 +61,14 @@ async function processSellixWebhook(request, headers, discordClient){
 				break;
 			}
 		
+		case "buyPingAddon":{
+
+			console.log('Received order to add ping addon.')
+
+			
+
+			break;
+		}
 		default: {
 			console.log("yikes");
 		}
