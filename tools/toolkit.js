@@ -60,7 +60,7 @@ async function createChannel(discordClient, guildID, masterUserID, createdBy, ca
 	const channelName = `${masterUser.username}'s Store`;
 	const channelDesc = `This shop was opened on ${moment()}`;
 	
-	const createdChannelID = await discordGuild.channels.create(channelName,{
+	await discordGuild.channels.create(channelName,{
 		topic : channelDesc,
 		parent: categoryID,
 	}).then((channel)=>{
@@ -73,26 +73,26 @@ async function createChannel(discordClient, guildID, masterUserID, createdBy, ca
 				'ATTACH_FILES': true,
 			}
 		);
-
+		prisma.channels.create({
+			data: {
+				guildID: guildID,
+				categoryID: categoryID,
+				channelID: channel.id,
+				createdBy: createdBy,
+				masterUser: masterUserID,
+				startsOn: moment().toISOString(),
+				expiresOn: moment().add(1, 'minute').toISOString()
+			}
+		}).then(()=>{
+			masterUser.send("Hello! Your channel has been successfully created!");
+		})
 		return channel.id;
 	}).catch(()=>{
 		masterUser.send("Something went wrong with your channel creation request. Please try again later or contact the server moderation team.");
 		return;
 	});
 
-	prisma.channels.create({
-		data: {
-			guildID: guildID,
-			categoryID: categoryID,
-			channelID: createdChannelID,
-			createdBy: createdBy,
-			masterUser: masterUserID,
-			startsOn: moment().toISOString(),
-			expiresOn: moment().add(1, 'minute').toISOString()
-		}
-	}).then(()=>{
-		masterUser.send("Hello! Your channel has been successfully created!");
-	})
+
 }
 
 async function createCategory(discordUser, discordGuild){
@@ -109,6 +109,7 @@ async function createCategory(discordUser, discordGuild){
 	const questions = [
 		"How many pings do you want shops to make per day?", 
 		"What will be the price for the shops in this category per day?", 
+		"What will be the price for a ping addon in this category per day?", 
 		"What will be the minimum days for which a user will be able to buy a shop?", 
 		"What do you want the maximum amount of open shops to be?"
 	];
@@ -237,6 +238,7 @@ async function createCategory(discordUser, discordGuild){
 			data: {
 				CategoryID: createdCategory.id,
 				guildID: discordGuild.id,
+				pingAddonPrice: parseFloat(answers["What will be the price for a ping addon in this category per day?"]).toFixed(2),
 				BasePingsPerDay: parseInt(answers["How many pings do you want shops to make per day?"]),
 				pricePerDay: parseFloat(answers["What will be the price for the shops in this category per day?"]).toFixed(2),
 				minimumDays: parseInt(answers["What will be the minimum days for which a user will be able to buy a shop?"]),
@@ -257,7 +259,47 @@ async function createCategory(discordUser, discordGuild){
 	})
 }
 
+async function addPingAddon(discordClient, providedChannelID){
+
+	const channelData = await prisma.channels.findFirst({
+		where:{
+			channelID: providedChannelID
+		}
+	})
+
+	console.log(channelData)
+
+	prisma.channels.updateMany({
+		where:{
+			channelID: providedChannelID
+		},
+		data: {
+			tagsPerDay: {
+				increment: 1
+			}
+		}
+	}).then(async ()=>{
+		const discordMasterUser = await discordClient.users.fetch(channelData.masterUser);
+		console.log(discordMasterUser);
+		const discordGuild = await discordClient.guilds.fetch(channelData.guildID);
+		console.log(discordGuild.cache);
+		const discordChannel = await discordClient.channels.fetch(channelData.channelID);
+		console.log(discordChannel);
+		const embed = new Discord.MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Success!')
+			.setDescription(`We have added 1 more ping for you to use per day on the ${discordChannel.name} store!`)
+			.addFields(
+				{ name: 'Discord Server Name', value: discordGuild.name, inline: true },
+				{ name: 'Discord Store Name', value: discordChannel.name, inline: true },
+				{ name: 'Current Pings per Day', value: channelData.tagsPerDay, inline: true }
+			)
+		
+		discordMasterUser.send(embed);
+	})
+}
 
 module.exports.closeChannel = closeChannel;
 module.exports.createChannel = createChannel;
 module.exports.createCategory = createCategory;
+module.exports.addPingAddon = addPingAddon;
