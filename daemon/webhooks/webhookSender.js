@@ -129,5 +129,71 @@ async function createCreationProductID(email, discordGuild, masterUser, days, di
 return await sellixRequest;
 }
 
+async function createPingAddonInvoice(channel, category, guild, email){
+
+	const categoryData = await prisma.categories.findFirst({
+		where: {
+			CategoryID: category.id
+		}
+	})
+/*
+	const channelData = await prisma.channels.findFirst({
+		where:{
+			channelID: channel.id
+		}
+	})
+*/
+	const guildSettings = await prisma.settings.findFirst({
+		where:{
+			guildID: guild.id 
+		}
+	})
+
+	const payload = {
+		"title": `Ping addon in shop ${channel.name}`,
+		"gateway": "bitcoin",
+		"value": categoryData.pingAddonPrice,
+		"currency": "USD",
+		"quantity": 1,
+		"confirmations": 1,
+		"email": email,
+		"custom_fields":  {
+			"action": "buyPingAddon",
+			"ChannelID": "C"+channel.id
+		},
+		"webhook": webhookURL,
+		"white_label": false,
+		"return_url": webhookURL
+	}
+
+	console.log(payload);
+
+	const sellixRequest = await axios({
+			method: "POST",
+			url: "https://dev.sellix.io/v1/payments",
+			data:payload,
+			headers: {
+				"User-Agent": "MarketplaceBotWebhooks",
+				"Authorization" : `Bearer ${guildSettings.sellixAPIKey}`,
+			}
+	})
+		.then((res)=>{
+			if(res.data.status != 200){
+				console.log(res);
+				throw `APIError ${res.data.status}`;	
+			}
+			console.log("success!");
+			console.log(res.data.data.url);
+			return res.data;
+		})
+		.catch((obj)=>{
+			console.log("error");
+			console.log(obj)
+		});
+
+	return await sellixRequest;
+}
+
 module.exports.createExtensionProductID = createExtensionProductID;
 module.exports.createCreationProductID = createCreationProductID;
+module.exports.createPingAddonInvoice = createPingAddonInvoice;
