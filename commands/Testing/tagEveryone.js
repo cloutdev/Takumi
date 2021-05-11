@@ -1,6 +1,6 @@
-const db = require("../../tools/database");
-const {QueryTypes} = require('sequelize');
 const prisma = require('../../tools/prisma')
+
+const moment = require('moment')
 //Here the command starts
 module.exports = {
     //definition
@@ -37,11 +37,20 @@ module.exports = {
 			return; 
 		}
 
-		const tagCount = (await db.query("SELECT count(*) as count from sentpings WHERE channelID = ? AND sentOn > DATE_SUB(now(), INTERVAL 1 DAY)",{
+		const tagCount = await prisma.sentpings.count({
+			where:{
+				channelID: message.channel.id,
+				sentOn: {
+					gte: moment().add(1, 'day').toISOString()
+				}
+			}
+		})
+
+		/*const tagCount = (await db.query("SELECT count(*) as count from sentpings WHERE channelID = ? AND sentOn > DATE_SUB(now(), INTERVAL 1 DAY)",{
 			replacements: [message.channel.id],
 			type: QueryTypes.SELECT,
 			logging: false,
-		}))[0].count;
+		}))[0].count;*/
 
 		if(dbChannel.tagsPerDay === tagCount){
 			message.reply("You have reached the max tag amount for today. Please wait until tagging everyone again.");
@@ -50,10 +59,17 @@ module.exports = {
 
 		message.channel.send("@everyone bump!");
 
-		await db.query('INSERT INTO sentPings (channelID, sentBy) values (?, ?)',{
+		/*await db.query('INSERT INTO sentPings (channelID, sentBy) values (?, ?)',{
 			replacements: [message.channel.id, user.id],
 			type: QueryTypes.INSERT,
 			logging: console.log,
+		})*/
+
+		await prisma.sentpings.create({
+			data:{
+				channelID: message.channel.id,
+				sentBy: user.id
+			}
 		})
     }
 }
