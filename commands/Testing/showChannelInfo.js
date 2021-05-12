@@ -18,6 +18,7 @@ module.exports = {
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
 
+      console.log(client.user)
 
         const channelData = await prisma.channels.findFirst({
             where:  {
@@ -62,6 +63,7 @@ module.exports = {
         const countMembers = message.guild.members.cache.filter(m => message.channel.permissionsFor(m).has('VIEW_CHANNEL')).size
         const mainMenuEmbed = new Discord.MessageEmbed()
         .setColor('#0099ff')
+        .setAuthor(client.user.username, client.user.displayAvatarURL(), 'https://github.com/cloutdev/MarketplaceBot')
         .setTitle('Channel Information and Actions')
         .addFields(
             { name: 'Shop Name', value: message.channel.name, inline: true },
@@ -97,24 +99,67 @@ module.exports = {
 
         sentInfoMessage.awaitReactions(filter, { max: 1, time: 30000, errors: ['time'] })
             .then(async (collected) => {
-                console.log(collected)
-                console.log(sentInfoMessage.reactions.resolve(collected.first().id));
                 const emoteReceived = collected.first().emoji.name;
 
-                //sentInfoMessage.reactions.resolve(collected.first().id).users.remove(user.id);
+                sentInfoMessage.reactions.resolve(collected.first()).users.remove(user.id)
                 switch (emoteReceived) {
                     case '⏲': {
-                        webhookSender.createExtensionProductID(message.channel.id, message.guild)
-                        break;
+                      const checkDMsEmbed = new Discord.MessageEmbed()
+                      .setColor('#0099ff')
+                      .setTitle('Please Check your DMs!')
+                      .setDescription('We have sent you a message directly and you will proceed with your request there.')
+                      .setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+                      .setTimestamp()
+                      message.reply(checkDMsEmbed);
+
+                      const shoppyResponseBody = await webhookSender.createExtensionProductID(message.channel.id, message.guild)
+
+                      if(shoppyResponseBody === undefined){
+                        user.send("There has been a problem with your request. Please check your inputs and try again.")
+                      }else{
+                        const successfulWebhookReceivedEmbed = new Discord.MessageEmbed()
+                        .setColor('#0099ff')
+                        .setTitle('Press here to be taken to the Shoppy invoice page!')
+                        .setDescription('When we receive your payment, we will renew your shop, with the days of subscription time that you requested.')
+                        .setURL(shoppyResponseBody);
+                        
+                        user.send(successfulWebhookReceivedEmbed);
+                      }
+                       break;
                     }
                     case 'pingReaction': {
-                        webhookSender.createPingAddonInvoice(message.channel, message.channel.parent)
-                        break;
+                      const checkDMsEmbed = new Discord.MessageEmbed()
+                      .setColor('#0099ff')
+                      .setTitle('Please Check your DMs!')
+                      .setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+                      .setDescription('We have sent you a message directly and you will proceed with your request there.')
+                      .setTimestamp()
+                      message.reply(checkDMsEmbed);
+                      const shoppyResponseBody = await webhookSender.createPingAddonInvoice(message.channel, message.channel.parent)
+                      if(shoppyResponseBody === undefined){
+                        user.send("There has been a problem with your request. Please check your inputs and try again.")
+                      }else{
+                        const successfulWebhookReceivedEmbed = new Discord.MessageEmbed()
+                        .setColor('#0099ff')
+                        .setTitle('Press here to be taken to the Shoppy invoice page!')
+                        .setDescription('When we receive your payment, we will add one ping for you to use per day on your shop.')
+                        .setURL(shoppyResponseBody);
+                        
+                        user.send(successfulWebhookReceivedEmbed);
+                      }
+                      break;
                     }
                     case '🏬': {
+                      const checkDMsEmbed = new Discord.MessageEmbed()
+                      .setColor('#0099ff')
+                      .setTitle('Please Check your DMs!')
+                      .setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+                      .setDescription('We have sent you a message directly and you will proceed with your request there.')
+                      .setTimestamp()
+                      message.reply(checkDMsEmbed);
 
-                        await buyNewStore(client, message, args, user);
-                        break;
+                      await buyNewStore(client, message, args, user);
+                      break;
                     }
                 }
 
@@ -130,18 +175,7 @@ async function buyNewStore(client, message, args, user){
 
       
       let shoppyResponseBody;
-      
-      
-      const checkDMsEmbed = new Discord.MessageEmbed()
-      .setColor('#0099ff')
-      .setTitle('Please check your DMs')
-      .setDescription('We have sent you a message directly and you will proceed with your request there.')
-      
-      message.reply(checkDMsEmbed);
-      
-      
-      //AwaitMessages for the category in which the user wants to create a new channel.
-      
+     
       const validCategories = await prisma.categories.findMany({
         where: {
           guildID: message.guild.id
