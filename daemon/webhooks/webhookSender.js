@@ -69,7 +69,7 @@ return await shoppyRequest;
 
 }
 
-async function createCreationProductID(email, discordGuild, masterUser, days, discordCategory){
+async function createCreationProductID(discordGuild, masterUser, discordCategory){
 
 	const category = await prisma.categories.findFirst({
 		where: {
@@ -96,8 +96,8 @@ async function createCreationProductID(email, discordGuild, masterUser, days, di
 				webhookURL
 			],
 			'quantity': {
-				"min" : days,
-				"max" : days
+				"min" : category.minimumDays,
+				"max" : 9999
 			},
 			'description': "When you pay this Shoppy invoice, we will automatically create a new shop channel for you to use."+variables,
 			"confirmations": 1
