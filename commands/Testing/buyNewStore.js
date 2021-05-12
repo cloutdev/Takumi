@@ -20,7 +20,7 @@ module.exports = {
   // eslint-disable-next-line no-unused-vars
   run: async (client, message, args, user, text, prefix) => {
     
-    let sellixResponseBody;
+    let shoppyResponseBody;
     let userEmail;
     let amountOfDays;
     
@@ -126,59 +126,8 @@ module.exports = {
     const selectedDiscordCategory = await client.channels.fetch(validCategories[categoryUserSelection].CategoryID)
     
     
-    //AwaitMessages for email address needed for Sellix invoice.
-    const emailRequestEmbed = new Discord.MessageEmbed()
-    .setColor('#0099ff')
-    .setTitle('Please Enter your Email')
-    .setDescription('We need your email to send you the receipts of purchase.\n\n'+
-    'We are asking you this inside private DMs because we do not want other users to see your email. Thank us later 😉')
-    .addFields(
-      { name: 'Your Discord User Tag', value: user.tag, inline: true },
-      { name: 'Your Discord User ID', value: user.id, inline: true },
-      { name: "Discord Guild ID", value: message.guild.id, inline: true })
-      .addFields(
-        {name: "Category Name", value: selectedDiscordCategory.name, inline: true},
-        { name: "Store's Price Per Day", value: validCategories[categoryUserSelection].pricePerDay, inline: true },
-        { name: "Minimum Invoice Amount", value: config.minimumInvoicePrice+"EUR", inline: true }
-        );
-        
-        
-        await user.send(emailRequestEmbed).then(async function(sentMessage){
-          await sentMessage.channel.awaitMessages(filter, { max: 1, time: 30000, errors: ['time'] })
-          .then((receivedAnswer)=>{
-            const enteredEmail = receivedAnswer.first().content;
-            if(!emailValidator.validate(enteredEmail)){
-              throw("invalidEmail");
-            }
-            userEmail = enteredEmail;
-            const embed = new Discord.MessageEmbed()
-            .setColor('#0099ff')
-            .setTitle('Thanks for entering your email!')
-            
-            sentMessage.channel.send(embed);
-          })
-          .catch((err)=>{
-            const embed = new Discord.MessageEmbed()
-            .setColor('#0099ff')
-            .setTitle('Oops! An error has occurred!')
-            .setDescription('We had some issues fetching your email. Maybe the available time ran out?\n\n'+
-            'If you want to start again, please resend the command wherever you sent it so we can fetch the needed data.')
-            
-            if(err === "invalidEmail"){
-              embed.addField("Error", "You entered an invalid email. Please reenter the command and try again.");
-            }else 
-            if(err.size === 0){
-              embed.addField("Error", "We did not receive any messages in the specified time window. Please reenter the command and try again.");
-            }
-            console.log(err);
-            sentMessage.channel.send(embed);  
-          });
-        });
-        
-        if (userEmail === undefined) return;
-        
         ///AwaitMessages for number of rental days. Check for minimum days as per database.
-        const daysRequestEmbed = new Discord.MessageEmbed()
+    const daysRequestEmbed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Please enter the amount of days for which you would like to buy a server spot on the server.')
         .setDescription('Below you will find the minimum amount of days you will be able to purchase. This is specified by the owner.')
@@ -186,9 +135,14 @@ module.exports = {
           { name: 'Minimum amount of days', value: guildData.minimumDays, inline: true },
           { name: "Store's Price Per Day", value: validCategories[categoryUserSelection].pricePerDay, inline: true },
           { name: 'Minimum Invoice Amount', value: config.minimumInvoicePrice+"EUR", inline: true },
-          );
+          )
+          .addFields(
+            { name: 'Your Discord User Tag', value: user.tag, inline: true },
+            {name: "Category Name", value: selectedDiscordCategory.name, inline: true},
+            { name: "Discord Guild ID", value: message.guild.id, inline: true })  
+          ;
           
-          await user.send(daysRequestEmbed).then(async function(sentEmbed){
+    await user.send(daysRequestEmbed).then(async function(sentEmbed){
             await sentEmbed.channel.awaitMessages(filter, { max: 1, time: 30000, errors: ['time'] })
             .then((receivedMessages)=>{
               const numberOfDays = receivedMessages.first().content;
@@ -237,8 +191,8 @@ module.exports = {
               
               return;
             });
-          });
-          if (amountOfDays === undefined) return;
+    });
+    if (amountOfDays === undefined) return;
           
           
           
@@ -261,23 +215,23 @@ module.exports = {
             user.send(successfulInputEmbed);
             
             
-            sellixResponseBody = await webhookSender.createCreationProductID(userEmail, message.guild, user, amountOfDays, selectedDiscordCategory);
-            if(sellixResponseBody === undefined){
+            shoppyResponseBody = await webhookSender.createCreationProductID(userEmail, message.guild, user, amountOfDays, selectedDiscordCategory);
+            if(shoppyResponseBody === undefined){
               user.send("There has been a problem with your request. Please check your inputs and try again.")
             }else{
               const successfulWebhookReceivedEmbed = new Discord.MessageEmbed()
               .setColor('#0099ff')
-              .setTitle('Press here to be taken to the Sellix invoice page!')
+              .setTitle('Press here to be taken to the Shoppy invoice page!')
               .setDescription('When we receive your payment, we will create your new shop, with the days of subscription time that you requested.')
-              .setURL(sellixResponseBody.data.url);
+              .setURL(shoppyResponseBody.data.url);
               
               user.send(successfulWebhookReceivedEmbed);
             }
             
-            if(sellixResponseBody === undefined){
+            if(shoppyResponseBody === undefined){
               message.reply("There has been a problem with your request. Please check your inputs and try again.")
             }else{
-              message.reply(`when you press on the following link, you will be redirected to a Sellix payment webpage, that when paid, will grant you an additional ${args[1]} day(s) of channel subscription time **for the channel that you are currently in.** \n ${sellixResponseBody.data.url}`);
+              message.reply(`when you press on the following link, you will be redirected to a Sellix payment webpage, that when paid, will grant you an additional ${args[1]} day(s) of channel subscription time **for the channel that you are currently in.** \n ${shoppyResponseBody.data.url}`);
             }
             
           }
