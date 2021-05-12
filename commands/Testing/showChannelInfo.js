@@ -166,6 +166,7 @@ module.exports = {
             })
             .catch((err) => {
                 console.log(err);
+                sentInfoMessage.reactions.removeAll();
             });
 
     }

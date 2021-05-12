@@ -63,12 +63,11 @@ module.exports = {
 			}
 			
 			const selectionEmbed = new Discord.MessageEmbed()
-				.setColor('#0099ff')
-				.setTitle('In which channel do you want to make a channel in?')
-				.setDescription('Please review the following available choices and enter the corresponding number.')
-				.addFields(categoriesEmbedJSON)
+			.setColor('#0099ff')
+			.setTitle('In which channel do you want to make a channel in?')
+			.setDescription('Please review the following available choices and enter the corresponding number.')
+			.addFields(categoriesEmbedJSON)
 			
-			user.send(selectionEmbed);
 			let userSelection;
 			await user.send(selectionEmbed).then(async function(sentEmbed){
 				await sentEmbed.channel.awaitMessages(filter, { max: 1, time: 30000, errors: ['time'] })
