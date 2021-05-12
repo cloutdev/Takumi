@@ -1,10 +1,5 @@
 const webhookSender = require("../../daemon/webhooks/webhookSender");
-const emailValidator = require('email-validator');
 const Discord = require("discord.js");
-const config = require("../../config.json");
-const { PrismaClient } = require('@prisma/client')
-
-const prisma = new PrismaClient()
 
 //Here the command starts
 module.exports = {
@@ -19,16 +14,6 @@ module.exports = {
     //running the command with the parameters: client, message, args, user, text, prefix
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
-        let userEmail;
-        let amountOfDays;
-        
-        const filter = receivedMsg => user.id === receivedMsg.author.id;
-
-        const guildData = await prisma.settings.findUnique({
-          where: {
-            guildID: message.guild.id
-          }
-        });
         
         const checkDMsEmbed = new Discord.MessageEmbed()
         .setColor('#0099ff')
@@ -45,16 +30,15 @@ module.exports = {
         'We need to clarify that, for simplicity, safety, and ease of use, we are using Sellix.io as our payment processor. That means that, we do not receive any information pertraining to your payment information, including possibly credit card info or PayPal credentials. We only receive information relevant to the invoice that has been paid, not to **how** it has been paid.\n\n'+
         'Below you will find the information we will send to Sellix to make your payment, and the subsequent Store creation. If you want to, you can use them to verify the information you provided.') 
         .addFields(
-          { name: 'Amount of Days of Subscription', value: amountOfDays, inline: true },
           { name: 'Channel ID (Your store\'s ID)', value: message.channel.id, inline: true },
           { name: 'Guild ID', value: message.guild.id, inline: true },
           )
           
       user.send(successfulInputEmbed);
 
-      const sellixResponseBody = await webhookSender.createExtensionProductID(message.channel.id, message.guild);
+      const shoppyResponseBody = await webhookSender.createExtensionProductID(message.channel.id, message.guild);
 
-      if(sellixResponseBody === undefined){
+      if(shoppyResponseBody === undefined){
         user.send("There has been a problem with your request. Please check your inputs and try again.")
       }
       else{
@@ -62,7 +46,7 @@ module.exports = {
           .setColor('#0099ff')
           .setTitle('Press here to be taken to the Sellix invoice page!')
           .setDescription('When we receive your payment, we will renew your shop, with the days of subscription time that you requested.')
-          .setURL(sellixResponseBody);
+          .setURL(shoppyResponseBody);
         
       user.send(successfulWebhookReceivedEmbed);
       }

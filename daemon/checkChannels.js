@@ -14,7 +14,7 @@ async function periodicCheckForChannels(client, guildSettings){
 			guildID: guildSettings.guildID
 		}
 	});
-	console.log(expiredChannels)
+	//console.log(expiredChannels)
 
 	expiredChannels.forEach((databaseChannel) => {
 		client.channels.fetch(databaseChannel.channelID).then((channel)=>{

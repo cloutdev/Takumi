@@ -91,6 +91,7 @@ async function processShoppyWebhook(request, headers, discordClient){
 
 }
 
+// eslint-disable-next-line no-unused-vars
 async function processSellixWebhook(request, headers, discordClient){
 
 	const allGuilds = await db.query("SELECT * from settings",{
@@ -184,6 +185,4 @@ function getStringBetween(string, prefix, suffix) {
 	}
 	return s;
 }
-
-module.exports.processSellixWebhook = processSellixWebhook;
 module.exports.processShoppyWebhook = processShoppyWebhook;

@@ -64,15 +64,15 @@ module.exports = {
 		user.send(embed);
 				
 				
-		const sellixResponseBody = await webhookSender.createPingAddonInvoice(message.channel, message.channel.parent, message.guild, userEmail);
-		if(sellixResponseBody === undefined){
+		const shoppyResponseBody = await webhookSender.createPingAddonInvoice(message.channel, message.channel.parent, message.guild, userEmail);
+		if(shoppyResponseBody === undefined){
 			user.send("There has been a problem with your request. Please check your inputs and try again.")
 		}else{
 			const successfulWebhookReceivedEmbed = new Discord.MessageEmbed()
 			.setColor('#0099ff')
-			.setTitle('Press here to be taken to the Sellix invoice page!')
+			.setTitle('Press here to be taken to the Shoppy invoice page!')
 			.setDescription('When we receive your payment, we will create your new shop, with the days of subscription time that you requested.')
-			.setURL(sellixResponseBody);
+			.setURL(shoppyResponseBody);
 			
 			user.send(successfulWebhookReceivedEmbed);
 		}
