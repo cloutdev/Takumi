@@ -64,7 +64,7 @@ module.exports = {
 			
 			const selectionEmbed = new Discord.MessageEmbed()
 			.setColor('#0099ff')
-			.setTitle('In which channel do you want to make a channel in?')
+			.setTitle('In which category do you want to make a channel in?')
 			.setDescription('Please review the following available choices and enter the corresponding number.')
 			.addFields(categoriesEmbedJSON)
 			
