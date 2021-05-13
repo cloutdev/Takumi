@@ -7,6 +7,14 @@ async function createExtensionProductID(submittedChannelID, discordGuild){
 	console.log("here");
 	console.log(submittedChannelID);
 
+	const guildData = await prisma.settings.findFirst({
+		where:{	
+			guildID: discordGuild.id
+		}
+	})
+
+console.log(guildData);
+
 	const channel = await prisma.channels.findFirst({
 		where:{
 			channelID: submittedChannelID
@@ -48,7 +56,7 @@ async function createExtensionProductID(submittedChannelID, discordGuild){
 		data:payload,
 		headers: {
 			"User-Agent": "MarketplaceBotWebhooks",
-			"Authorization" : `${"NJW3lDkWg6VFXRd599a6kAmz17pOc6N2CCF7Aha8qMZt4SwOSU"}`,
+			"Authorization" : `${guildData.shoppyAPIKey}`,
 		}
 	})
 	.then((res)=>{
@@ -74,6 +82,12 @@ async function createCreationProductID(discordGuild, masterUser, discordCategory
 	const category = await prisma.categories.findFirst({
 		where: {
 			CategoryID: discordCategory.id
+		}
+	})
+
+	const guildData = await prisma.settings.findFirst({
+		where:{
+			guildID: discordGuild.id
 		}
 	})
 
@@ -112,7 +126,7 @@ async function createCreationProductID(discordGuild, masterUser, discordCategory
 		data:payload,
 		headers: {
 			"User-Agent": "MarketplaceBotWebhooks",
-			"Authorization" : `${"NJW3lDkWg6VFXRd599a6kAmz17pOc6N2CCF7Aha8qMZt4SwOSU"}`,
+			"Authorization" : `${guildData.shoppyAPIKey}`,
 		}
 	})
 	.then((res)=>{
@@ -133,6 +147,12 @@ return await shoppyRequest;
 }
 
 async function createPingAddonInvoice(channel, category){
+
+	const guildData = await prisma.settings.findFirst({
+		where:{
+			guildID: channel.guild.id
+		}
+	})
 
 	const categoryData = await prisma.categories.findFirst({
 		where: {
@@ -169,7 +189,7 @@ async function createPingAddonInvoice(channel, category){
 			data:payload,
 			headers: {
 				"User-Agent": "MarketplaceBotWebhooks",
-				"Authorization" : `${"NJW3lDkWg6VFXRd599a6kAmz17pOc6N2CCF7Aha8qMZt4SwOSU"}`,
+				"Authorization" : `${guildData.shoppyAPIKey}`,
 			}
 		})
 		.then((res)=>{
@@ -189,59 +209,6 @@ async function createPingAddonInvoice(channel, category){
 	return await shoppyRequest;
 }
 
-async function sendShoppyWebhook(){
-
-	const fields = [
-		["Action", "buyPingAddon"], 
-		["channelID", "841641687327440916"],
-	];
-
-	const variables = createVariablesString(fields);
-
-	const payload = {
-		"product": {
-			"title": "Example",
-			"price": 50,
-			"webhook_urls": [
-				"https://f7c034fa355e.ngrok.io"
-			],					
-			'quantity': {
-				"min" : 1,
-				"max" : 1
-			},
-			'description': "Testing! <br><br> XDDDDDDDD"+variables,
-			"confirmations": 1
-		}
-	}
-
-	console.log(payload);
-
-	const shoppyRequest = await axios({
-			method: "POST",
-			url: "https://shoppy.gg/api/v1/pay",
-			data:payload,
-			headers: {
-				"User-Agent": "MarketplaceBotWebhooks",
-				"Authorization" : `${"NJW3lDkWg6VFXRd599a6kAmz17pOc6N2CCF7Aha8qMZt4SwOSU"}`,
-			}
-		})
-		.then((res)=>{
-			console.log(res)
-			if(res.data.status === false){
-				console.log(res);
-				throw `APIError ${res.data.status}`;	
-			}
-			console.log("success!");
-			console.log(res.data.details);
-			return res.data.details.urls.payment.url;
-		})
-		.catch((obj)=>{
-			console.log("error");
-			console.log(obj)
-		});
-
-	return await shoppyRequest;
-}
 
 function createVariablesString(varArray){
 	let variables = "<br> ";
@@ -257,5 +224,3 @@ function createVariablesString(varArray){
 module.exports.createExtensionProductID = createExtensionProductID;
 module.exports.createCreationProductID = createCreationProductID;
 module.exports.createPingAddonInvoice = createPingAddonInvoice;
-
-module.exports.sendShoppyWebhook = sendShoppyWebhook;
