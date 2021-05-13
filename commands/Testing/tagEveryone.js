@@ -1,4 +1,5 @@
 const prisma = require('../../tools/prisma')
+const Discord = require('discord.js')
 
 const moment = require('moment')
 //Here the command starts
@@ -27,24 +28,37 @@ module.exports = {
 			logging: false,
 		}))[0];*/
 
-		if(user.id != dbChannel.masterUser){
-			message.reply("You must be a master user to do that!");
-			return;
-		}
 
-		if(dbChannel.isClosed === 1){
-			message.reply("This is supposed to be a closed channel");
-			return; 
+		const mods = await prisma.mods.findFirst({
+			where:{
+				channelID: message.channel.id,
+				modID: user.id
+			}
+		})
+
+		if(mods === undefined){
+			const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('You must be the shop owner to do that!')
+				.setDescription('Please let the shop owner know that you want someone to add that person to the mod team.')
+				.addFields(
+					{ name: 'title', value: 'value', inline: false },
+				)
+			
+				message.reply(embed);
+			return;
 		}
 
 		const tagCount = await prisma.sentpings.count({
 			where:{
 				channelID: message.channel.id,
 				sentOn: {
-					gte: moment().add(1, 'day').toISOString()
+					gt: moment().subtract(1, 'day').toISOString()
 				}
 			}
 		})
+		console.log(moment().add(1, 'day').toISOString())
+		console.log(tagCount);
 
 		/*const tagCount = (await db.query("SELECT count(*) as count from sentpings WHERE channelID = ? AND sentOn > DATE_SUB(now(), INTERVAL 1 DAY)",{
 			replacements: [message.channel.id],
@@ -52,8 +66,15 @@ module.exports = {
 			logging: false,
 		}))[0].count;*/
 
-		if(dbChannel.tagsPerDay === tagCount){
-			message.reply("You have reached the max tag amount for today. Please wait until tagging everyone again.");
+		console.log(dbChannel.tagsPerDay)	
+
+		if(tagCount >= dbChannel.tagsPerDay){
+			const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('You have reached the maximum amount of tags for today!')
+				.setDescription('Please wait until tagging everyone again.')
+			
+				message.reply(embed);
 			return;
 		}
 
