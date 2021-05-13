@@ -6,9 +6,12 @@ const prisma = require('../../tools/prisma')
 const moment = require('moment')
 
 async function processShoppyWebhook(request, headers, discordClient){
-	const allGuilds = await db.query("SELECT * from settings",{
-        type: QueryTypes.SELECT,
-	});
+
+	const allGuilds = await prisma.settings.findMany({
+		where: {
+			isActive: true
+		}
+	})
 
 	console.log(request);
 	console.log(headers);
@@ -18,7 +21,7 @@ async function processShoppyWebhook(request, headers, discordClient){
 
 	//If you do not know what Iterable.every() is, Google it
 	await allGuilds.every((selectedGuild) => {
-		const secret = "XdPoMfZX6YZjv6Kw";
+		const secret = selectedGuild.shoppySecret;
 		const received_signature = headers["x-shoppy-signature"];
 		var digest = crypto
 			.createHmac('sha512', secret)
