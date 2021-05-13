@@ -19,14 +19,18 @@ module.exports = {
   run: async (client, message, args, user, text, prefix) => {
     
     
+    console.log(user)
+
     let shoppyResponseBody;
     
     
+
     const checkDMsEmbed = new Discord.MessageEmbed()
     .setColor('#0099ff')
-    .setTitle('Please check your DMs')
+    .setTitle('Please Check your DMs!')
+    .setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
     .setDescription('We have sent you a message directly and you will proceed with your request there.')
-    
+    .setTimestamp()
     message.reply(checkDMsEmbed);
     
     
@@ -121,20 +125,18 @@ module.exports = {
     const successfulInputEmbed = new Discord.MessageEmbed()
     .setColor('#0099ff')
     .setTitle('Thanks for your inputs!')
-    .setDescription('Using your inputs, the guild ID, and your User ID, we will now make some behind-the-scenes magic to deliver you a Sellix payment invoice.\n\n'+
-    'When that invoice is paid, with any of the payment methods you would like, we will automatically create a channel for you where you will be the owner.\n\n'+
-    'We need to clarify that, for simplicity, safety, and ease of use, we are using Sellix.io as our payment processor. That means that, we do not receive any information pertraining to your payment information, including possibly credit card info or PayPal credentials. We only receive information relevant to the invoice that has been paid, not to **how** it has been paid.\n\n'+
-    'Below you will find the information we will send to Sellix to make your payment, and the subsequent Store creation.') 
+    .setDescription('Using your datawe will now make some behind-the-scenes magic to deliver you a Shoppy payment invoice.\n\n'+
+    'When that invoice is paid, with any of the payment methods that are offered, we will automatically create a channel for you where you will be the owner.\n\n') 
     .addFields(
       { name: 'Master User ID (Your Discord ID)', value: user.id, inline: true },
       { name: 'Guild ID', value: message.guild.id, inline: true },
       { name: 'Category Name', value: selectedDiscordCategory.name, inline: true}
-      )
+    )
       
-      user.send(successfulInputEmbed);
+    user.send(successfulInputEmbed);
       
       
-      shoppyResponseBody = await webhookSender.createCreationProductID(message.guild, user, selectedDiscordCategory);
+    shoppyResponseBody = await webhookSender.createCreationProductID(message.guild, user, selectedDiscordCategory);
       if(shoppyResponseBody === undefined){
         user.send("There has been a problem with your request. Please check your inputs and try again.")
       }else{
