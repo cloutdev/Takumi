@@ -2,7 +2,7 @@ const db = require("../tools/database");
 const {QueryTypes} = require('sequelize');
 const moment = require('moment');
 const prisma = require("../tools/prisma");
-const Discord = require('discord.js')
+const Discord = require('discord.js');
 
 async function closeChannel(channelToBeClosed, reason, discordClient){
 
@@ -46,7 +46,16 @@ async function closeChannel(channelToBeClosed, reason, discordClient){
 			channel.send(channelToBeClosed.name+" Moved to Closed Channels!");
 		});
 		discordClient.users.fetch(dbChannel.masterUser).then((user)=>{
-			user.send(`Hello! We had to close the channel you had purchased at the server \`${channelToBeClosed.guild.name}\` for the following reason: \nReason: \`${reason}\``);
+
+			const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('Channel Closed')
+				.setDescription(`Hello! We had to close the channel you had purchased at the server \`${channelToBeClosed.guild.name}\` for the following reason: \nReason: \`${reason}\``)
+				.addFields(
+					{ name: 'title', value: 'value', inline: false },
+				)
+			
+			user.send(embed);
 		});
 	});
 }
@@ -60,6 +69,12 @@ async function createChannel(discordClient, guildID, masterUserID, createdBy, ca
 	const channelName = `${masterUser.username}'s Store`;
 	const channelDesc = `This shop was opened on ${moment()}`;
 	
+	const categoryData = await prisma.categories.findFirst({
+		where:{
+			CategoryID: categoryID
+		}
+	})
+
 	await discordGuild.channels.create(channelName,{
 		topic : channelDesc,
 		parent: categoryID,
@@ -81,10 +96,16 @@ async function createChannel(discordClient, guildID, masterUserID, createdBy, ca
 				createdBy: createdBy,
 				masterUser: masterUserID,
 				startsOn: moment().toISOString(),
-				expiresOn: moment().add(1, 'minute').toISOString()
+				expiresOn: moment().add(1, 'minute').toISOString(),
+				tagsPerDay: categoryData.BasePingsPerDay
 			}
 		}).then(()=>{
-			masterUser.send("Hello! Your channel has been successfully created!");
+			const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('Your channel has been successfully created!')
+
+			
+				masterUser.send(embed);
 		})
 		return channel.id;
 	}).catch(()=>{

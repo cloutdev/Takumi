@@ -1,4 +1,5 @@
 const prisma = require('../../tools/prisma')
+const Discord = require('discord.js')
 
 //Here the command starts
 module.exports = {
@@ -21,12 +22,24 @@ module.exports = {
 		})
 
 		if(dbChannel === undefined){
-			message.reply("you are not in a valid channel!");
+
+			const noChannelFoundEmbed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle("you are not in a valid channel!")
+				.setDescription('Please go to a valid channel and try to use the command there.');
+				message.reply(noChannelFoundEmbed);
+
 			return;
 		}
 
 		if(args.length == 0){
-			message.reply("you did not provide any users to add as a moderator.");
+
+			const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('No moderators Found!')
+				.setDescription("you did not provide any users to add as a moderator.\n\nPlease try to tag them.")
+			
+				message.reply(embed);
 			return;
 		}
 		
