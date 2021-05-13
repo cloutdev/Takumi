@@ -24,9 +24,8 @@ module.exports = {
 			
 
 			message.reply(checkDMsEmbed)
-			toolkit.createCategory(user, message.guild);
 
-			return;
+			
 			const closedCategoryID = (await message.guild.channels.create("Closed Shops",{
 				type: 'category',
 				permissionOverwrites: [
@@ -38,6 +37,7 @@ module.exports = {
 			})
 			).id;
 
+			return;
 
 			// TODO: Fix this fucking shit what is this
 
