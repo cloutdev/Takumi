@@ -45,7 +45,6 @@ module.exports = {
 			}
 		})
 		
-		let userEmail;
 		const embed = new Discord.MessageEmbed()
 		.setColor('#0099ff')
 		.setTitle('Are you sure you want to proceed?')
@@ -64,7 +63,7 @@ module.exports = {
 		user.send(embed);
 				
 				
-		const shoppyResponseBody = await webhookSender.createPingAddonInvoice(message.channel, message.channel.parent, message.guild, userEmail);
+		const shoppyResponseBody = await webhookSender.createPingAddonInvoice(message.channel, message.channel.parent);
 		if(shoppyResponseBody === undefined){
 			user.send("There has been a problem with your request. Please check your inputs and try again.")
 		}else{
