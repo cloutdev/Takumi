@@ -44,10 +44,8 @@ model settings {
   owner             String  @db.VarChar(18)
   adminRoleID       String  @db.VarChar(18)
   isActive          Boolean @default(true)
-  pricePerDay       Decimal @db.Decimal(15, 2)
-  minimumDays       Int     @db.SmallInt
-  sellixAPIKey      String  @db.VarChar(64)
-  sellixSecret      String  @db.VarChar(255)
+  shoppyAPIKey      String  @db.VarChar(64)
+  shoppySecret      String  @db.VarChar(255)
 }
 
 model categories {
