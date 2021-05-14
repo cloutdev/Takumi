@@ -63,6 +63,13 @@ module.exports = {
 			})
 		});
 
+		const successEmbed = new Discord.MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('Added!')
+			.setDescription('All the moderators you specified have been added to the moderation team.')
+		
+		message.channel.send(successEmbed);
+
 		function getUserFromMention(mention) {
 			if (!mention) return;
 		
