@@ -15,7 +15,6 @@ function startServer(client){
     const rawReq = await getRawBody(req)
     
     manager.processShoppyWebhook(rawReq, req.headers, client);
-    //manager.processSellixWebhook(rawReq, req.headers, client);
     res.status(200).end() // Responding is important
   })
 }
