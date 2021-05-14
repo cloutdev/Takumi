@@ -1,6 +1,7 @@
 const Discord = require('discord.js')
 const prisma = require('../../tools/prisma')
 const moment = require('moment')
+const toolkit = require('../../tools/toolkit')
 
 const webhookSender = require('../../daemon/webhooks/webhookSender')
 const buyNewStoreCommand = require('./buyNewStore')
@@ -91,10 +92,11 @@ module.exports = {
           await sentInfoMessage.react('⏲');
           await sentInfoMessage.react('<:pingReaction:842005597527605248>');
           await sentInfoMessage.react('🏬');
+          await sentInfoMessage.react('❌');
           
           const filter = (reaction, reactionUserSender) => {
             
-            if(((reaction.emoji.name === '⏲') || (reaction.emoji.name === 'pingReaction') || (reaction.emoji.name === '🏬')) && (reactionUserSender.id === message.author.id)){
+            if(((reaction.emoji.name === '⏲') || (reaction.emoji.name === '❌') || (reaction.emoji.name === 'pingReaction') || (reaction.emoji.name === '🏬')) && (reactionUserSender.id === message.author.id)){
               return true;
             }else return false;
           };
@@ -154,6 +156,10 @@ module.exports = {
               case '🏬': {
                 await buyNewStoreCommand.run(client, message, args, user, text, prefix)
 
+                break;
+              }
+              case '❌': {
+                toolkit.closeChannel(message.channel, `Channel shutdown requested by ${user.tag}`, client);
                 break;
               }
             }
