@@ -11,9 +11,6 @@ async function processShoppyWebhook(request, headers, discordClient){
 		}
 	})
 
-	console.log(request);
-	console.log(headers);
-
 	let guild;
 	let body;
 
@@ -25,12 +22,9 @@ async function processShoppyWebhook(request, headers, discordClient){
 			.createHmac('sha512', secret)
 			.update(request, 'utf8', 'hex')
 			.digest('hex');
-		
-			console.log(digest)
 		if(received_signature === digest) {
 			guild = selectedGuild;
 			body = JSON.parse(request.toString());
-			console.log(body)
 			return false;
 		}else return true;
 	});

@@ -1,7 +1,7 @@
 const axios = require("axios").default;
 const prisma = require('../../tools/prisma')
 
-const webhookURL =  "https://123ad24304f6.ngrok.io";
+const webhookURL =  "http://172.104.157.28:3000";
 
 async function createExtensionProductID(submittedChannelID, discordGuild){
 	console.log("here");
