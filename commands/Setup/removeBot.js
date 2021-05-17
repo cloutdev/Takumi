@@ -13,7 +13,19 @@ module.exports = {
     //running the command with the parameters: client, message, args, user, text, prefix
     // eslint-disable-next-line no-unused-vars
     run: async (client, message, args, user, text, prefix) => {
-        if (message.guild.ownerID !== user.id){console.log("no perms")}
+
+	
+		if(message.guild.ownerID !== user.id){
+			const embed = new Discord.MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('You do not have permission to do that!')
+			.setDescription('The server\'s administation will need to give you access to the role to execute this command')
+			.setFooter(`Takumi - Requested by ${user.tag}`)
+			
+			message.reply(embed);
+			
+			return;
+		}
         
         await prisma.settings.update({
             where: {

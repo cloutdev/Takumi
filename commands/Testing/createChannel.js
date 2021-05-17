@@ -14,10 +14,29 @@ module.exports = {
 		//running the command with the parameters: client, message, args, user, text, prefix '581575466578870302', '675476898926559239'
 		// eslint-disable-next-line no-unused-vars
 		run: async (client, message, args, user, text, prefix) => {
+
+			const guildSettings = await prisma.settings.findUnique({
+				where: {
+					guildID: message.guild.id
+				}
+			});
+			
+			if(!(message.member.roles.cache.has(guildSettings.adminRoleID))){
+				const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('You do not have permission to do that!')
+				.setDescription('The server\'s administation will need to give you access to the role to execute this command')
+				.setFooter(`Takumi - Requested by ${user.tag}`)
+				
+				message.reply(embed);
+				
+				return;
+			}
+
 			const checkDMsEmbed = new Discord.MessageEmbed()
 			.setColor('#0099ff')
 			.setTitle('Please Check your DMs!')
-			.setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+			.setFooter(`Takumi - requested by ${user.tag}`)
 			.setTimestamp()
 			message.reply(checkDMsEmbed);
 

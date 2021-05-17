@@ -17,6 +17,18 @@ module.exports = {
 	// eslint-disable-next-line no-unused-vars
 	run: async (client, message, args, user, text, prefix) => {
 		
+		if(message.guild.ownerID !== user.id){
+			const embed = new Discord.MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('You do not have permission to do that!')
+			.setDescription('The server\'s administation will need to give you access to the role to execute this command')
+			.setFooter(`Takumi - Requested by ${user.tag}`)
+			
+			message.reply(embed);
+			
+			return;
+		}
+
 		const emoteFilter = (reaction, reactionUserSender) => {
 			if(((reaction.emoji.name === '✅') || (reaction.emoji.name === '❌')) && (reactionUserSender.id === message.author.id)){
 				return true;
@@ -379,7 +391,7 @@ const firstEmbed = new discord.MessageEmbed()
 .setAuthor('Welcome!')
 .setDescription("Please enter the name of the channel that you would like the bot to make **public** announcements")
 .setTimestamp()
-.setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`);
+.setFooter(`Takumi - requested by ${user.tag}`);
 
 await message.channel.send(firstEmbed).then(()=>{
 	message.channel.awaitMessages(filter, {
@@ -400,7 +412,7 @@ await message.channel.send(firstEmbed).then(()=>{
 			.setAuthor('Step 2')
 			.setDescription("Please enter the Channel ID of the channel that you would like the bot to send confidential messages to. This should only have permissions for the owners/moderators of the server.")
 			.setTimestamp()
-			.setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`);
+			.setFooter(`Takumi - requested by ${user.tag}`);
 			
 			message.channel.send(secondEmbed).then(()=>{
 				message.channel.awaitMessages(filter, {
@@ -419,7 +431,7 @@ await message.channel.send(firstEmbed).then(()=>{
 						.setAuthor('Step 2')
 						.setDescription("Please enter the display name of the bot.")
 						.setTimestamp()
-						.setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`);
+						.setFooter(`Takumi - requested by ${user.tag}`);
 						
 						message.channel.send(thirdEmbed).then(()=>{
 							message.channel.awaitMessages(filter, {
@@ -438,7 +450,15 @@ await message.channel.send(firstEmbed).then(()=>{
 									.setAuthor('Step 2')
 									.setDescription("Please enter the display name of the bot.")
 									.setTimestamp()
-									.setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`);
+									.setFooter(`			const embed = new Discord.MessageEmbed()
+			.setColor('#0099ff')
+			.setTitle('You do not have permission to do that!')
+			.setDescription('The server\'s administation will need to give you access to the role to execute this command')
+			.setFooter(`Takumi - Requested by ${user.tag}`)
+			
+			message.reply(embed);
+			
+			return;requested by ${user.tag}`);
 									
 									message.channel.send(fourthEmbed).then(()=>{
 										message.channel.awaitMessages(filter, {

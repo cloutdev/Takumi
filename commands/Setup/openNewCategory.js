@@ -27,7 +27,7 @@ module.exports = {
 			.setColor('#0099ff')
 			.setTitle('You do not have permission to do that!')
 			.setDescription('The server\'s administation will need to give you access to the role to execute this command')
-			.setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+			.setFooter(`Takumi - Requested by ${user.tag}`)
 			
 			message.reply(embed);
 			
@@ -37,7 +37,7 @@ module.exports = {
 		const checkDMsEmbed = new Discord.MessageEmbed()
 		.setColor('#0099ff')
 		.setTitle('Please Check your DMs!')
-		.setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+		.setFooter(`Takumi - Requested by ${user.tag}`)
 		.setTimestamp()
 		message.reply(checkDMsEmbed).then(()=>{
 			toolkit.createCategory(user, message.guild)

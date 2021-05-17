@@ -22,6 +22,19 @@ module.exports = {
 			}
 		})
 
+
+		const guildSettings = await prisma.settings.findUnique({
+			where: {
+				guildID: message.guild.id
+			}
+		});
+		
+		if(!(message.member.roles.cache.has(guildSettings.adminRoleID))){
+
+		}
+
+
+
 		/*const dbChannel = (await db.query("SELECT * from channels WHERE channelID = ?",{
 			replacements: [message.channel.id],
 			type: QueryTypes.SELECT,
@@ -38,14 +51,13 @@ module.exports = {
 
 		if(mods === undefined){
 			const embed = new Discord.MessageEmbed()
-				.setColor('#0099ff')
-				.setTitle('You must be the shop owner to do that!')
-				.setDescription('Please let the shop owner know that you want someone to add that person to the mod team.')
-				.addFields(
-					{ name: 'title', value: 'value', inline: false },
-				)
+			.setColor('#0099ff')
+			.setTitle('You do not have permission to do that!')
+			.setDescription('The shop\'s administation will need to give you access to the shop\'s moderation team to execute this command')
+			.setFooter(`Takumi - Requested by ${user.tag}`)
 			
-				message.reply(embed);
+			message.reply(embed);
+			
 			return;
 		}
 

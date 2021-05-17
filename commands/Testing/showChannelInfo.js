@@ -66,7 +66,7 @@ module.exports = {
     const countMembers = message.guild.members.cache.filter(m => message.channel.permissionsFor(m).has('VIEW_CHANNEL')).size
     const mainMenuEmbed = new Discord.MessageEmbed()
     .setColor('#0099ff')
-    .setAuthor(client.user.username, client.user.displayAvatarURL(), 'https://github.com/cloutdev/MarketplaceBot')
+    .setAuthor(client.user.username, client.user.displayAvatarURL(), 'https://www.takumibot.xyz/')
     .setTitle('Channel Information and Actions')
     .addFields(
       { name: 'Shop Name', value: message.channel.name, inline: true },
@@ -112,7 +112,7 @@ module.exports = {
                 .setColor('#0099ff')
                 .setTitle('Please Check your DMs!')
                 .setDescription('We have sent you a message directly and you will proceed with your request there.')
-                .setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+                .setFooter(`Takumi - requested by ${user.tag}`)
                 .setTimestamp()
                 message.reply(checkDMsEmbed);
                 
@@ -135,7 +135,7 @@ module.exports = {
                 const checkDMsEmbed = new Discord.MessageEmbed()
                 .setColor('#0099ff')
                 .setTitle('Please Check your DMs!')
-                .setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+                .setFooter(`Takumi - requested by ${user.tag}`)
                 .setDescription('We have sent you a message directly and you will proceed with your request there.')
                 .setTimestamp()
                 message.reply(checkDMsEmbed);

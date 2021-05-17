@@ -32,6 +32,17 @@ module.exports = {
 			return;
 		}
 
+		if(user.id != dbChannel.masterUser){
+
+			const embed = new Discord.MessageEmbed()
+				.setColor('#0099ff')
+				.setTitle('No moderators Found!')
+				.setDescription("you did not provide any users to add as a moderator.\n\nPlease try to tag them.")
+			
+				message.reply(embed);
+			return;
+		}
+
 		if(args.length == 0){
 
 			const embed = new Discord.MessageEmbed()

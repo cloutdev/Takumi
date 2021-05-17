@@ -55,7 +55,7 @@ console.log(guildData);
 		url: "https://shoppy.gg/api/v1/pay",
 		data:payload,
 		headers: {
-			"User-Agent": "MarketplaceBotWebhooks",
+			"User-Agent": "TakumiWebhooks",
 			"Authorization" : `${guildData.shoppyAPIKey}`,
 		}
 	})
@@ -125,7 +125,7 @@ async function createCreationProductID(discordGuild, masterUser, discordCategory
 		url: "https://shoppy.gg/api/v1/pay",
 		data:payload,
 		headers: {
-			"User-Agent": "MarketplaceBotWebhooks",
+			"User-Agent": "TakumiWebhooks",
 			"Authorization" : `${guildData.shoppyAPIKey}`,
 		}
 	})
@@ -188,7 +188,7 @@ async function createPingAddonInvoice(channel, category){
 			url: "https://shoppy.gg/api/v1/pay",
 			data:payload,
 			headers: {
-				"User-Agent": "MarketplaceBotWebhooks",
+				"User-Agent": "TakumiWebhooks",
 				"Authorization" : `${guildData.shoppyAPIKey}`,
 			}
 		})

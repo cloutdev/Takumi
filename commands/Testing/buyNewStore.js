@@ -28,7 +28,7 @@ module.exports = {
     const checkDMsEmbed = new Discord.MessageEmbed()
     .setColor('#0099ff')
     .setTitle('Please Check your DMs!')
-    .setFooter(`Clout's Marketplace Bot, requested by ${user.tag}`)
+    .setFooter(`Takumi - requested by ${user.tag}`)
     .setDescription('We have sent you a message directly and you will proceed with your request there.')
     .setTimestamp()
     message.reply(checkDMsEmbed);
